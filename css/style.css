@@ -1,0 +1,233 @@
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-size: 20px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#background {
+    background: linear-gradient(black, blueviolet, black);
+    background: linear-gradient(blueviolet, black);
+    position: fixed;
+    display: inline-block;
+    width: 100%;
+}
+
+#menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+}
+
+#gameLeft {
+    position: fixed;
+    display: inline-block;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 23%;
+    border-width: 15px;
+    border-style: solid;
+    border-image: linear-gradient(to bottom, #2e0555, #00000000, #2e0555) 15 40%;
+    z-index: 2;
+    text-align: center;
+    background: linear-gradient(#424139, #c1b5a8, #413f38)
+}
+
+#gameCenter {
+    top: 0;
+    left: 25%;
+    right: 25%;
+    bottom: 0;
+    position: fixed;
+    display: inline-block;
+    border-width: 15px;
+    border-style: solid;
+    border-image: linear-gradient(to bottom, #2e0555, #00000000, #2e0555) 15 40%;
+    background: linear-gradient(#011c36, #011c36be, #011c36);
+    z-index: 1;
+    cursor: url(curso.gif), auto;
+}
+
+#gameCenter {
+    display: inline-block;
+}
+
+#dinheiro {
+    width: 49%;
+    position: fixed;
+    z-index: -1;
+}
+
+#dinheiro img {
+    width: 20%;
+    display: inline-block;
+    z-index: -1;
+}
+
+#personagem img, #enimei img {
+    margin-top: 50%;
+    width: 100%;
+    display: inline-block;
+    z-index: 1;
+}
+
+#personagem, #enimei {
+    width: 49%;
+    display: inline-block;
+    z-index: 1;
+}
+
+#cenario {
+    z-index: -20;
+    width: 50%;
+}
+
+#cenario img {
+    margin-top: -30%;
+    width: 48%;
+    z-index: -20;
+    position: fixed;
+}
+
+#cenario2 {
+    z-index: -20;
+    width: 50%;
+}
+
+#cenario2 img {
+    margin-top: -1%;
+    width: 48%;
+    z-index: -20;
+    position: fixed;
+    transform: rotate(180deg);
+}
+
+#gameRight {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 23%;
+    position: fixed;
+    display: inline-block;
+    border-width: 15px;
+    border-style: solid;
+    border-image: linear-gradient(to bottom, #2e0555, #00000000, #2e0555) 15 40%;
+    z-index: 3;
+    background: linear-gradient(#424139, #c1b5a8, #413f38);
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.item {
+    margin: 10px;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    border-width: 5px;
+    border-style: solid;
+    border-image: linear-gradient(to bottom, black, #00000000, black) 15 40%;
+}
+
+.item img {
+    width: 10%;
+    float: left;
+    position: relative;
+}
+
+#conquistas {
+    margin: 10px;
+    text-align: center;
+    border-width: 5px;
+    border-style: solid;
+    border-image: linear-gradient(to bottom, #553f03, #000000d0, #553f03) 15 40%;
+    padding: 10px;
+}
+
+#loja {
+    margin: 10px;
+    text-align: center;
+    border-width: 5px;
+    border-style: solid;
+    border-image: linear-gradient(to bottom, #553f03, #000000d0, #553f03) 15 40%;
+    padding: 10px;
+    cursor: pointer;
+}
+
+#config {
+    margin: 10px;
+    text-align: center;
+    border-width: 5px;
+    border-style: solid;
+    border-image: linear-gradient(to bottom, #553f03, #000000d0, #553f03) 15 40%;
+    padding: 10px;
+    cursor: pointer;
+}
+
+#valor {
+    margin: 10px;
+    text-align: center;
+    border-width: 5px;
+    border-style: solid;
+    border-image: linear-gradient(to bottom, #553f03, #000000d0, #553f03) 15 40%;
+    padding: 10px;
+    position: relative;
+    display: inline-block;
+}
+
+#valor ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#valor img {
+    width: 50%;
+}
+
+#preco {
+    float: right;
+}
+
+#menuLoja {
+    position: fixed;
+    top: 20%;
+    left: 30%;
+    right: 0;
+    bottom: 0;
+    background: #413f38d7;
+    border: 1px solid black;
+    width: 40%;
+    height: 50%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#configLoja {
+    position: fixed;
+    top: 15%;
+    left: 30%;
+    right: 0;
+    bottom: 0;
+    background: #413f38d7;
+    border: 1px solid black;
+    width: 40%;
+    height: 20%;
+}
+
+#efeito {
+    margin-top: 10%;
+}

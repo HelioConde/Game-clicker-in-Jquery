@@ -1,2 +1,2 @@
-# Game-clicker-in-Jquery
-Jogo onde o objetivo e clickar e consegui dinheiro para comprar mais armas
+# Jogo feito utilizando Jquery
+Jogo de click baseado no cookie clicker
