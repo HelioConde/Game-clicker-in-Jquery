@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Game Clicker</title>
     <link rel="stylesheet" href="css/style.css">
     <!--
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -25,7 +25,7 @@
     <div id="background"></div>
     <div id="menu">
         <div id="gameLeft">
-            <div id="valor"></div>
+            <div id="valor" aria-live="polite"></div><div id="stats"></div>
             <div id="conquistas">Conquistas</div>
             <div id="config">Configurações</div>
             <div id="loja">Loja</div>
@@ -34,7 +34,7 @@
             <amp-auto-ads type="adsense" data-ad-client="ca-pub-2120906100952795">
             </amp-auto-ads>
         </div>
-        <div id="gameCenter">
+        <div id="gameCenter" role="button" tabindex="0" aria-label="Atacar monstro">
             <div id="dinheiro"></div>
             <div id="personagem"><img src="img/stop.png" alt=""></div>
             <div id="enimei"><img src="img/monstro.gif" alt=""></div>
