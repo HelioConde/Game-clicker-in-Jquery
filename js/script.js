@@ -137,7 +137,10 @@
       arena.dataset.enemy = enemy.id;
       const frame = $("enemyFrame");
       frame.dataset.sheet = enemy.sheet ? "true" : "false";
-      if (enemy.sheet) frame.style.setProperty("--enemy-spritesheet", 'url("' + enemy.sheet + '")');
+      if (enemy.sheet) {
+        const assetUrl = new URL(enemy.sheet, document.baseURI).href;
+        frame.style.setProperty("--enemy-spritesheet", 'url("' + assetUrl + '")');
+      }
       else frame.style.removeProperty("--enemy-spritesheet");
       // Ataques especiais são reiniciados sempre que a fase mudar.
       bossBattle.stage = enemy.stage;
