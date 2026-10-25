@@ -136,7 +136,7 @@
       badge.className = "skill-status";
       badge.textContent = statusText;
       button.replaceChildren(caption, badge);
-      button.setAttribute("aria-label", name.replace(/^[^\\wÀ-ÿ]+/, "").trim() +
+      button.setAttribute("aria-label", (isFury ? "Fúria" : "Golpe poderoso") +
         (active ? ", ativa por mais " + activeSeconds + " segundos"
           : remain > 0 ? ", recarga em " + Math.ceil(remain) + " segundos" : ", pronto"));
     }
