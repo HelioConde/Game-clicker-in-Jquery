@@ -1,0 +1,23 @@
+name: QA Game Clicker
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar JavaScript
+        run: |
+          node --check js/game-core.js
+          node --check js/script.js
+      - name: Rodar testes de combate e migração
+        run: node --test tests/game-core.test.cjs
