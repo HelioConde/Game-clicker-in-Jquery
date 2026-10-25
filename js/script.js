@@ -118,12 +118,27 @@
       const active = isFury && core.furyActive(state, now);
       button.disabled = remain > 0;
       button.classList.toggle("active", active);
-      const label = isFury ? "🔥 Fúria (2× por 10s)" : "⚡ Golpe poderoso (5×)";
-      button.textContent = active
-        ? label + " · ATIVA"
-        : remain > 0 ? label + " · " + Math.ceil(remain) + "s" : label + " · PRONTO";
-      button.setAttribute("aria-label", (isFury ? "Ativar Fúria" : "Ativar Golpe poderoso") +
-        (remain > 0 ? ", disponível em " + Math.ceil(remain) + " segundos" : ", pronto"));
+      button.classList.toggle("cooldown", remain > 0 && !active);
+      const name = isFury ? "🔥 Fúria" : "⚡ Golpe poderoso";
+      const info = isFury ? "2× por 10s" : "Dano 5×";
+      const activeSeconds = active ? Math.ceil(Math.max(0,(state.furyUntil - now)/1000)) : 0;
+      const statusText = active ? "ATIVA · " + activeSeconds + "s"
+        : remain > 0 ? "Recarrega em " + Math.ceil(remain) + "s" : "PRONTO";
+      const progress = remain > 0
+        ? Math.round(100 * (1 - Math.min(1, remain * 1000 / core.SKILLS[key].cooldown))) : 0;
+      button.style.setProperty("--cooldown-progress", progress + "%");
+      // Somente conteúdo estático; valores são produzidos pelo próprio estado do jogo.
+      // Manter o elemento button estável evita perder foco durante a atualização.
+      const caption = document.createElement("span");
+      caption.className = "skill-name";
+      caption.textContent = name + " · " + info;
+      const badge = document.createElement("span");
+      badge.className = "skill-status";
+      badge.textContent = statusText;
+      button.replaceChildren(caption, badge);
+      button.setAttribute("aria-label", (isFury ? "Fúria" : "Golpe poderoso") +
+        (active ? ", ativa por mais " + activeSeconds + " segundos"
+          : remain > 0 ? ", recarga em " + Math.ceil(remain) + " segundos" : ", pronto"));
     }
   }
   function renderEnemy() {

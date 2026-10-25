@@ -402,3 +402,83 @@ test("Etapa 8 respeita movimento reduzido e exibe pose estática da spritesheet"
   expect(details.animation).toBe("none");
   expect(details.position).toBe("0% 0%");
 });
+
+
+test("Etapa 8.1 mantém escala coerente e alinhamento pelo chão",async ({browser},info)=>{
+  const mobile=info.project.name==="mobile-chromium";
+  const viewport=mobile?{width:390,height:844}:{width:1366,height:647};
+  async function inspect(stage){
+    const context=await browser.newContext({viewport});
+    const page=await context.newPage();
+    try {
+      await openWithSave(page,{stage});
+      return await page.evaluate(()=>{
+        const bounds=id=>{
+          const r=document.getElementById(id).getBoundingClientRect();
+          return {width:r.width,height:r.height,top:r.top,bottom:r.bottom};
+        };
+        return {
+          hero:bounds("personagem"),enemy:bounds("enemyFrame"),
+          arena:bounds("attackButton"),
+          pageHeight:document.documentElement.scrollHeight,viewport:innerHeight
+        };
+      });
+    } finally {await context.close();}
+  }
+  const bat=await inspect(32);
+  const slime=await inspect(4);
+  const golem=await inspect(21);
+  const boss=await inspect(40);
+  expect(bat.enemy.width).toBeLessThan(bat.hero.width*.85);
+  expect(slime.enemy.width).toBeLessThan(slime.hero.width*.9);
+  expect(golem.enemy.width).toBeGreaterThan(bat.enemy.width);
+  expect(boss.enemy.width).toBeGreaterThan(golem.enemy.width);
+  for (const item of [bat,slime,golem,boss]){
+    expect(Math.abs(item.hero.bottom-item.enemy.bottom)).toBeLessThanOrEqual(4);
+    expect(item.enemy.top).toBeGreaterThanOrEqual(item.arena.top-3);
+    expect(item.enemy.bottom).toBeLessThanOrEqual(item.arena.bottom+3);
+    expect(item.pageHeight).toBeLessThanOrEqual(item.viewport+2);
+  }
+});
+
+test("Etapa 8.1 mantém itens não compráveis e melhorias legíveis",async ({page})=>{
+  await openWithSave(page,{money:0});
+  await expect(page.locator("#item10")).toHaveClass(/unaffordable/);
+  const legibility=await page.evaluate(()=>{
+    const shop=document.querySelector("#item10");
+    const upgrade=document.querySelector(".upgrade-button:disabled");
+    const css=e=>({opacity:getComputedStyle(e).opacity,color:getComputedStyle(e).color});
+    return {
+      shop:css(shop),name:css(shop.querySelector(".item-name")),
+      upgrade:css(upgrade),heading:css(upgrade.querySelector(".upgrade-heading")),
+      description:css(upgrade.querySelector("small"))
+    };
+  });
+  expect(legibility.shop.opacity).toBe("1");
+  expect(legibility.name.opacity).toBe("1");
+  expect(legibility.upgrade.opacity).toBe("1");
+  expect(legibility.heading.color).not.toBe("rgb(0, 0, 0)");
+  expect(legibility.description.color).not.toBe("rgb(0, 0, 0)");
+});
+
+test("Etapa 8.1 mostra recarga com segundos e progresso sem mudar altura",async ({page})=>{
+  await page.clock.install();
+  await openWithSave(page,{stage:1});
+  await page.locator("#smashSkill").click();
+  await expect(page.locator("#smashSkill")).toHaveClass(/cooldown/);
+  await expect(page.locator("#smashSkill .skill-status")).toContainText("Recarrega em 15s");
+  const before=await page.locator("#smashSkill").evaluate(el=>getComputedStyle(el).getPropertyValue("--cooldown-progress").trim());
+  await page.clock.runFor(5000);
+  await expect(page.locator("#smashSkill .skill-status")).toContainText("Recarrega em 10s");
+  const after=await page.locator("#smashSkill").evaluate(el=>getComputedStyle(el).getPropertyValue("--cooldown-progress").trim());
+  expect(parseFloat(after)).toBeGreaterThan(parseFloat(before));
+  await page.locator("#furySkill").click();
+  await expect(page.locator("#furySkill .skill-status")).toContainText("ATIVA");
+  await page.clock.runFor(10000);
+  await expect(page.locator("#furySkill .skill-status")).toContainText("Recarrega em");
+  await expect(page.locator("#smashSkill .skill-status")).toHaveText("PRONTO");
+  const sizes=await page.evaluate(()=>({height:document.documentElement.scrollHeight,
+    viewport:innerHeight,width:document.documentElement.scrollWidth,viewportWidth:innerWidth}));
+  expect(sizes.height).toBeLessThanOrEqual(sizes.viewport+2);
+  expect(sizes.width).toBeLessThanOrEqual(sizes.viewportWidth+2);
+});
