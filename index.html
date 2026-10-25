@@ -59,18 +59,22 @@
         <button id="attackButton" class="arena" type="button" aria-label="Atacar inimigo">
           <span class="arena-scene" aria-hidden="true">
             <img class="scene-character" id="personagem" src="img/stop.png" alt="">
-            <img class="scene-enemy" id="enimei" src="img/monstro.gif" alt="">
+            <span id="enemyFrame" class="enemy-frame">
+              <img class="scene-enemy" id="enimei" src="img/monstro.gif" alt="">
+            </span>
           </span>
           <span class="attack-prompt">TOQUE PARA ATACAR</span>
           <span id="hitNumber" class="hit-number" aria-hidden="true"></span>
           <span id="waveNotice" class="wave-notice" aria-hidden="true"></span>
           <span id="impactBurst" class="impact-burst" aria-hidden="true"></span>
+          <span id="bossTelegraph" class="boss-telegraph" aria-hidden="true"></span>
           <span id="defeatGhost" class="defeat-ghost" aria-hidden="true"><img id="defeatSprite" alt=""></span>
           <span id="victoryBanner" class="victory-banner" aria-hidden="true"></span>
         </button>
         <div class="skill-bar" aria-label="Habilidades especiais">
           <button id="smashSkill" type="button" class="skill-button" aria-label="Ativar Golpe poderoso"></button>
           <button id="furySkill" type="button" class="skill-button" aria-label="Ativar Fúria"></button>
+          <button id="bossGuard" type="button" class="skill-button boss-guard" aria-label="Esquivar do ataque do chefe, tecla E" hidden>🛡️ Esquivar (E)</button>
         </div>
         <p id="offlineMessage" class="offline-message" role="status" hidden></p>
         <p id="battleMessage" class="battle-message" role="status" aria-live="polite">Uma criatura bloqueia seu caminho. Prepare sua espada!</p>
