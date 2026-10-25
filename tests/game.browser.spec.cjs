@@ -180,7 +180,7 @@ test("moedas visuais independem de fonte emoji e mantêm valores",async ({page})
     await page.locator('.view-tab[data-view="shop"]').click();
   await expect(page.locator("#valor")).toHaveText("0");
   const visual=await page.evaluate(()=>{
-    const item=document.querySelector(".coin-icon");
+    const item=document.querySelector(".item .coin-icon");
     const wallet=window.getComputedStyle(document.querySelector("#valor"),"::before");
     const style=window.getComputedStyle(item);
     return {
