@@ -234,7 +234,8 @@ test("Etapa 6 carrega monstros e chefes diferentes, inclusive a fase 21", async 
       await expect(page.locator("#attackButton")).toHaveAttribute("data-enemy",id);
       await expect(page.locator("#attackButton")).toHaveAttribute("data-biome",biome);
       await expect(page.locator("#enimei")).toHaveAttribute("src",new RegExp(src.replace(".","\\.")+"$"));
-      await expect(page.locator("#bossBadge")).toBeVisible({visible:stage%10===0});
+      if(stage%10===0) await expect(page.locator("#bossBadge")).toBeVisible();
+      else await expect(page.locator("#bossBadge")).toBeHidden();
       await expect.poll(()=>page.locator("#enimei").evaluate(img=>img.complete&&img.naturalWidth>0)).toBe(true);
       const screen=await page.evaluate(()=>({height:document.documentElement.scrollHeight,viewport:innerHeight}));
       expect(screen.height).toBeLessThanOrEqual(screen.viewport+2);
