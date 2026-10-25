@@ -183,7 +183,7 @@ test("Fúria dobra golpes e DPS na interface sem reativar durante cooldown", () 
 
 test("recompensa offline é concedida apenas uma vez, sem progredir fases", () => {
   const t=1_700_000_000_000;
-  const state=game.normalize({version:3,money:100,owned:[0,0,0,0,5,0,0,0,0,0],stage:3,hp:7,lastSeen:t});
+  const state=game.normalize({version:3,money:100,owned:[0,0,0,0,1,0,0,0,0,0],stage:3,hp:7,lastSeen:t});
   const claim=game.claimOffline(state,t+600_000);
   assert.equal(claim.seconds,600);
   assert.equal(claim.gold,120);
@@ -196,7 +196,7 @@ test("recompensa offline é concedida apenas uma vez, sem progredir fases", () =
 
 test("recompensas offline têm teto de 8 horas e não premiam relógio regressivo", () => {
   const t=1_700_000_000_000;
-  const state=game.normalize({version:3,money:0,owned:[0,0,0,0,5,0,0,0,0,0],lastSeen:t});
+  const state=game.normalize({version:3,money:0,owned:[0,0,0,0,1,0,0,0,0,0],lastSeen:t});
   assert.equal(game.claimOffline(state,t-60_000).gold,0);
   const claim=game.claimOffline(state,t+900_000_000);
   assert.equal(claim.seconds,28800);
