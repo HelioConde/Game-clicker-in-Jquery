@@ -748,3 +748,11 @@ body{min-height:0}
 @media(prefers-reduced-motion:reduce){
   .battle-panel .skill-button.cooldown::after{transition:none}
 }
+
+
+/* A Fúria permanece legível enquanto ativa, mesmo aguardando a recarga. */
+.battle-panel .skill-button.active:disabled{
+  opacity:1;
+  border-color:#edbc7b;
+  background:#624330;
+}
