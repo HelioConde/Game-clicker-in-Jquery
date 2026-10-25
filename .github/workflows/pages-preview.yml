@@ -53,7 +53,7 @@ jobs:
           cp js/game-core.js js/script.js dist/js/
           cp img/*.png img/*.gif img/*.webp dist/img/
           cp img/inimigos/*.svg dist/img/inimigos/
-          cp efeito/espada.mp3 efeito/dinheiro.mp3 efeito/erro.mp3 dist/efeito/
+          cp efeito/espada.mp3 efeito/dinheiro.mp3 efeito/erro.mp3 efeito/levelup.mp3 dist/efeito/
           touch dist/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
