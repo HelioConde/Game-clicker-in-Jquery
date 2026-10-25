@@ -318,3 +318,27 @@ test("dano massivo mantém informação do último chefe derrotado",()=>{
   assert.equal(result.defeatedBoss.stage%10,0);
   assert.ok(result.defeated.stage>=result.defeatedBoss.stage);
 });
+
+test("Etapa 8 oferece spritesheet de quatro quadros sem alterar sprite original", () => {
+  for (const stage of [4,7,10,11,20,21,30]) {
+    const monster=game.enemyFor(stage);
+    assert.ok(monster.sheet.endsWith("-sheet.svg"));
+    assert.equal(monster.sheet,monster.sprite.replace(".svg","-sheet.svg"));
+    assert.equal(monster.hp,game.enemyFor(stage).hp);
+    assert.equal(monster.reward,game.enemyFor(stage).reward);
+  }
+  const legacy=game.enemyFor(1);
+  assert.equal(legacy.sprite,"img/monstro.gif");
+  assert.equal(legacy.sheet,null);
+});
+
+test("Etapa 8 mantém HP, recursos e progresso salvos durante rotação de monstros", () => {
+  const old={version:3,balanceVersion:2,money:1234,owned:Array(10).fill(0),
+    stage:21,hp:177,kills:20,bosses:2,upgrades:{strength:2}};
+  const state=game.normalize(old);
+  assert.equal(state.stage,21);
+  assert.equal(state.hp,177);
+  assert.equal(state.money,1234);
+  assert.equal(state.kills,20);
+  assert.equal(game.enemyFor(state.stage).sheet,"img/inimigos/golem-pedra-sheet.svg");
+});

@@ -64,6 +64,7 @@
     const meta=ENEMIES[id];
     return {
       stage:wave,boss,id,name:meta.name,sprite:meta.sprite,
+      sheet:meta.sprite.endsWith(".svg")?meta.sprite.replace(".svg","-sheet.svg"):null,
       biome:REGIONS[regionIndex],
       hp:Math.min(MAX,Math.ceil(12*hpCurve(wave)*(boss?3.5:1))),
       reward:Math.min(MAX,Math.ceil(10*Math.pow(1.2,wave-1)*(boss?6:1)))

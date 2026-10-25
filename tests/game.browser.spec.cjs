@@ -325,3 +325,80 @@ test("HP após fase 30 permanece estável em recargas do save migrado",async ({p
   const second=await page.evaluate(()=>JSON.parse(localStorage.getItem("gameClickerV3")).hp);
   expect(second).toBe(first.hp);
 });
+
+test("Etapa 8 carrega spritesheet real de quatro quadros sem perder o sprite original", async ({page})=>{
+  await openWithSave(page,{stage:4});
+  await expect(page.locator("#enimei")).toHaveAttribute("src",/slime-bosque\.svg$/);
+  const details=await page.evaluate(async()=>{
+    const frame=document.getElementById("enemyFrame");
+    const pseudo=getComputedStyle(frame,"::before");
+    const sheet=window.GameCore.enemyFor(4).sheet;
+    const response=await fetch(sheet);
+    const source=await response.text();
+    const w=source.match(/viewBox="0 0 (\d+) (\d+)"/);
+    const raw=await (await fetch(window.GameCore.enemyFor(4).sprite)).text();
+    const orig=raw.match(/viewBox="0 0 (\d+) (\d+)"/);
+    return {status:response.status,frames:+w[1]/+orig[1],
+      duration:pseudo.animationDuration,name:pseudo.animationName,
+      sheet:frame.dataset.sheet,background:pseudo.backgroundImage,opacity:getComputedStyle(document.getElementById("enimei")).opacity};
+  });
+  expect(details.status).toBe(200);
+  expect(details.frames).toBe(4);
+  expect(details.name).toBe("enemy-sprites-4");
+  expect(details.sheet).toBe("true");
+  expect(details.background).toContain("slime-bosque-sheet.svg");
+  expect(details.opacity).toBe("0");
+});
+
+test("Etapa 8 permite esquivar do chefe e pune golpe não defendido",async ({page})=>{
+  await page.clock.install();
+  await openWithSave(page,{stage:10});
+  await page.clock.runFor(8300);
+  await expect(page.locator("#bossGuard")).toBeVisible();
+  await expect(page.locator("#bossTelegraph")).toContainText("pressione E");
+  await page.keyboard.press("e");
+  await expect(page.locator("#bossGuard")).toBeDisabled();
+  await page.clock.runFor(2500);
+  await expect(page.locator("#attackButton")).not.toHaveClass(/boss-stunned/);
+  await expect(page.locator("#battleMessage")).toContainText("esquivou");
+  await page.clock.runFor(8200);
+  await expect(page.locator("#bossGuard")).toBeVisible();
+  await page.clock.runFor(2800);
+  await expect(page.locator("#attackButton")).toHaveClass(/boss-stunned/);
+  const hp=await page.locator("#enemyHpBar").evaluate(el=>el.value);
+  await page.locator("#attackButton").click();
+  expect(await page.locator("#enemyHpBar").evaluate(el=>el.value)).toBe(hp);
+  await page.clock.runFor(1400);
+  await page.locator("#attackButton").click();
+  expect(Number(await page.locator("#enemyHpBar").evaluate(el=>el.value))).toBeLessThan(Number(hp));
+});
+
+test("Etapa 8 mantém as três habilidades dentro da viewport durante ataque do chefe",async ({page},info)=>{
+  await page.clock.install();
+  await page.setViewportSize(info.project.name==="desktop-chromium"
+    ? {width:1366,height:647}:{width:390,height:844});
+  await openWithSave(page,{stage:10});
+  await page.clock.runFor(8300);
+  for (const id of ["smashSkill","furySkill","bossGuard"]) {
+    const control=page.locator("#"+id);
+    await expect(control).toBeVisible();
+    const bounds=await control.boundingBox();
+    const metrics=await page.evaluate(()=>({width:innerWidth,height:innerHeight,
+      scrollHeight:document.documentElement.scrollHeight,scrollWidth:document.documentElement.scrollWidth}));
+    expect(bounds.y+bounds.height).toBeLessThanOrEqual(metrics.height-2);
+    expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.height+2);
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.width+2);
+  }
+});
+
+test("Etapa 8 respeita movimento reduzido e exibe pose estática da spritesheet",async ({page})=>{
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await openWithSave(page,{stage:20});
+  const details=await page.evaluate(()=>{
+    const el=document.getElementById("enemyFrame");
+    const style=getComputedStyle(el,"::before");
+    return {animation:style.animationName,position:style.backgroundPosition};
+  });
+  expect(details.animation).toBe("none");
+  expect(details.position).toBe("0% 0%");
+});

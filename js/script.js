@@ -15,6 +15,11 @@
     if (audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
   };
   const status = $("saveStatus");
+  const bossGuard = $("bossGuard");
+  const bossBattle = {
+    stage: state.stage, started: performance.now(), guarded: false,
+    stunUntil: 0, hiddenAt: 0
+  };
   // Em telas pequenas, uma área por vez mantém o combate inteiro visível.
   // Não altera a partida, o save nem a disposição com três colunas no desktop.
   const app = document.querySelector(".app");
@@ -130,6 +135,24 @@
       sprite.dataset.enemyStage = String(enemy.stage);
       arena.dataset.biome = enemy.biome;
       arena.dataset.enemy = enemy.id;
+      const frame = $("enemyFrame");
+      frame.dataset.sheet = enemy.sheet ? "true" : "false";
+      if (enemy.sheet) {
+        const assetUrl = new URL(enemy.sheet, document.baseURI).href;
+        frame.style.setProperty("--enemy-spritesheet", 'url("' + assetUrl + '")');
+      }
+      else frame.style.removeProperty("--enemy-spritesheet");
+      // Ataques especiais são reiniciados sempre que a fase mudar.
+      bossBattle.stage = enemy.stage;
+      bossBattle.started = performance.now();
+      bossBattle.guarded = false;
+      bossBattle.stunUntil = 0;
+      arena.classList.remove("boss-warning","boss-stunned");
+      $("bossTelegraph").textContent = "";
+      bossGuard.hidden = true;
+      bossGuard.disabled = false;
+      bossGuard.textContent = "🛡️ Esquivar (E)";
+      document.querySelector(".skill-bar").classList.remove("has-guard");
     }
     $("stageLabel").textContent = "FASE " + number(state.stage);
     $("enemyName").textContent = enemy.name;
@@ -198,6 +221,62 @@
       banner.classList.add("show");
     }
   }
+  function dodgeBoss() {
+    if (bossGuard.hidden || bossGuard.disabled || bossBattle.guarded) return;
+    bossBattle.guarded = true;
+    bossGuard.disabled = true;
+    bossGuard.textContent = "✓ Esquivado";
+    message("Esquiva preparada! O golpe do chefe não vai interromper seus ataques.");
+  }
+  bossGuard.addEventListener("click",dodgeBoss);
+  document.addEventListener("keydown",event=>{
+    if(event.key.toLowerCase() !== "e" || event.repeat ||
+       event.altKey || event.ctrlKey || event.metaKey ||
+       ["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName)) return;
+    if (!bossGuard.hidden && !bossGuard.disabled) {
+      event.preventDefault(); dodgeBoss();
+    }
+  });
+  function updateBossAttack(now) {
+    const monster=core.enemyFor(state.stage), arena=$("attackButton");
+    if (!monster.boss) {
+      arena.classList.remove("boss-warning","boss-stunned");
+      bossGuard.hidden=true;
+      document.querySelector(".skill-bar").classList.remove("has-guard");
+      return;
+    }
+    if (now < bossBattle.stunUntil) arena.classList.add("boss-stunned");
+    else arena.classList.remove("boss-stunned");
+    const elapsed=Math.max(0,now-bossBattle.started);
+    if (elapsed >= 10500) {
+      arena.classList.remove("boss-warning");
+      bossGuard.hidden=true;
+      document.querySelector(".skill-bar").classList.remove("has-guard");
+      if (bossBattle.guarded) {
+        message("Você esquivou do ataque de " + monster.name + "!");
+      } else {
+        bossBattle.stunUntil=now+1250;
+        arena.classList.add("boss-stunned");
+        message(monster.name + " atingiu você! Ataques manuais interrompidos por 1,25 s.");
+        sound("erro");
+      }
+      bossBattle.started=now;
+      bossBattle.guarded=false;
+      bossGuard.disabled=false;
+      bossGuard.textContent="🛡️ Esquivar (E)";
+      return;
+    }
+    if (elapsed >= 8000) {
+      arena.classList.add("boss-warning");
+      $("bossTelegraph").textContent="⚠ Ataque de " + monster.name + " — pressione E para esquivar!";
+      bossGuard.hidden=false;
+      document.querySelector(".skill-bar").classList.add("has-guard");
+    } else {
+      arena.classList.remove("boss-warning");
+      bossGuard.hidden=true;
+      document.querySelector(".skill-bar").classList.remove("has-guard");
+    }
+  }
   function onResults(result) {
     if (!result.kills) return;
     animateDefeat(result);
@@ -230,7 +309,7 @@
   let animating = false;
   let attackTimer = null;
   function attack() {
-    if (animating) return;
+    if (animating || performance.now()<bossBattle.stunUntil) return;
     animating = true;
     const hit = core.strike(state, Date.now());
     const damage = hit.damage;
@@ -276,12 +355,23 @@
   let last = performance.now();
   let lastSave = last;
   // Não concede recompensas offline nesta etapa; isso pertence ao futuro sistema Idle.
-  document.addEventListener("visibilitychange", () => { last = performance.now(); if(document.hidden) save(); });
+  document.addEventListener("visibilitychange", () => {
+    const now=performance.now();
+    last=now;
+    if(document.hidden) {
+      bossBattle.hiddenAt=now; save();
+    } else if(bossBattle.hiddenAt) {
+      bossBattle.started+=Math.max(0,now-bossBattle.hiddenAt);
+      bossBattle.stunUntil+=bossBattle.stunUntil>now ? Math.max(0,now-bossBattle.hiddenAt):0;
+      bossBattle.hiddenAt=0;
+    }
+  });
   setInterval(() => {
     const now = performance.now();
     const elapsed = Math.min(0.5, Math.max(0, (now - last) / 1000));
     last = now;
     if (document.hidden) return;
+    updateBossAttack(now);
     renderSkills(Date.now());
     const power = core.dps(state) * (core.furyActive(state, Date.now()) ? 2 : 1);
     if (power > 0) {

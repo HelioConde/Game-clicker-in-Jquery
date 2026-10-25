@@ -46,6 +46,16 @@ O projeto começou como um **clicker em jQuery em 2022** e foi modernizado mante
 - Bônus offline: 20% do DPS por segundo, a partir de 60s ausente e limite de 8 horas; não avança fases offline.
 - Sem conta, banco de dados ou servidor necessários.
 
+## Etapa 8 — Spritesheets, chefes e defesa
+
+- Cada um dos cinco novos inimigos possui uma **spritesheet SVG horizontal de quatro quadros** (`img/inimigos/*-sheet.svg`). São poses derivadas das artes vetoriais existentes, com pequenas variações de escala/altura; não são desenhos inteiramente novos.
+- A interface apresenta os quadros por CSS na arena, preservando o atributo `src` do sprite original para compatibilidade e fallback. A criatura legada continua com o GIF original.
+- Chefes anunciam um ataque periodicamente: **após 8 segundos de combate** surge uma janela de 2,5 segundos para usar **Esquivar (E)**. Se o jogador não esquivar, seus ataques manuais ficam interrompidos por 1,25 segundos; o DPS automático continua ativo.
+- Mecânica especial é **transitória**, sem adicionar penalidades permanentes ao save e sem mudar vida, dinheiro ou atributos do personagem. O ciclo de ataque é pausado quando a aba perde visibilidade.
+- Telas mobile mantêm os controles dentro da própria arena; o botão de esquiva aparece apenas durante o aviso, ao lado das habilidades. O documento segue limitado a **uma única tela**.
+- `prefers-reduced-motion` apresenta o primeiro quadro fixo e remove a animação de aviso.
+- Testes Playwright verificam quadros reais, defesa do chefe, penalidade, viewport e movimento reduzido.
+
 ## Etapa 7 — Animações e balanceamento
 
 - Movimentos próprios de idle via CSS: slime saltita, morcego flutua, golem respira e chefes pairam. As artes SVG originais continuam intactas e o GIF histórico mantém sua animação.
