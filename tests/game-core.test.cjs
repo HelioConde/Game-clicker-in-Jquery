@@ -211,3 +211,51 @@ test("dever respeitar limite de avanço por tick sob dano extremo", () => {
   assert.equal(state.stage,51);
   assert.equal(state.kills,50);
 });
+
+test("Etapa 6 alterna inimigos por fase sem alterar HP ou recompensa", () => {
+  const expected = [
+    [1,"shadow","bosque","img/monstro.gif"],
+    [4,"slime","bosque","img/inimigos/slime-bosque.svg"],
+    [7,"bat","bosque","img/inimigos/morcego-crepusculo.svg"],
+    [10,"guardian","bosque","img/inimigos/guardiao-bosque.svg"],
+    [11,"golem","eclipse","img/inimigos/golem-pedra.svg"],
+    [20,"titan","eclipse","img/inimigos/colosso-eclipse.svg"],
+    [21,"golem","montanha","img/inimigos/golem-pedra.svg"],
+    [30,"guardian","montanha","img/inimigos/guardiao-bosque.svg"]
+  ];
+  for (const [stage,id,biome,sprite] of expected) {
+    const monster=game.enemyFor(stage);
+    assert.equal(monster.id,id,"sprite incorreto na fase "+stage);
+    assert.equal(monster.biome,biome);
+    assert.equal(monster.sprite,sprite);
+    assert.equal(monster.boss,stage%10===0);
+    assert.equal(monster.hp,Math.min(1e15,Math.ceil(12*Math.pow(1.22,stage-1)*(monster.boss?3.5:1))));
+    assert.equal(monster.reward,Math.min(1e15,Math.ceil(10*Math.pow(1.2,stage-1)*(monster.boss?6:1))));
+  }
+});
+
+test("save antigo na fase 21 preserva HP, chefe e sprites determinísticos", () => {
+  const raw={version:3,money:1234,owned:Array(10).fill(0),stage:21,hp:177,kills:20,bosses:2};
+  const s=game.normalize(raw);
+  assert.equal(s.stage,21);
+  assert.equal(s.hp,177);
+  assert.equal(s.kills,20);
+  assert.equal(s.bosses,2);
+  assert.equal(game.enemyFor(s.stage).id,"golem");
+  assert.equal(game.enemyFor(s.stage).sprite,game.enemyFor(s.stage).sprite);
+  const before=s.money;
+  const hit=game.damage(s,12);
+  assert.equal(hit.kills,0);
+  assert.equal(s.money,before);
+  assert.equal(s.hp,165);
+});
+
+test("chefes das regiões alternam aparência mantendo ciclo de dez fases", () => {
+  const a=game.enemyFor(10);
+  const b=game.enemyFor(20);
+  const c=game.enemyFor(30);
+  assert.notEqual(a.id,b.id);
+  assert.equal(a.id,c.id);
+  assert.equal(a.reward,game.enemyFor(10).reward);
+  assert.ok(b.hp>game.enemyFor(19).hp);
+});

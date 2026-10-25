@@ -355,3 +355,87 @@ body{min-height:0}
   .battle-panel .arena-scene{padding-bottom:10px}
   .battle-panel .scene-character,.battle-panel .scene-enemy{height:min(100%,33dvh)}
 }
+
+
+/* Etapa 6 — biomas e ataques sem acrescentar altura ao jogo. */
+.battle-panel .arena{
+  --biome-a:rgba(20,74,65,.13);
+  --biome-b:rgba(11,26,45,.40);
+  background-image:linear-gradient(180deg,var(--biome-a),var(--biome-b)),url("../img/cenario.png");
+  transition:box-shadow .25s,border-color .25s;
+}
+.battle-panel .arena[data-biome="bosque"]{--biome-a:rgba(28,105,58,.06);--biome-b:rgba(13,58,40,.18)}
+.battle-panel .arena[data-biome="eclipse"]{--biome-a:rgba(69,32,99,.23);--biome-b:rgba(29,11,53,.43)}
+.battle-panel .arena[data-biome="montanha"]{--biome-a:rgba(105,132,141,.18);--biome-b:rgba(24,49,67,.32)}
+.battle-panel .arena[data-biome="crepusculo"]{--biome-a:rgba(106,56,132,.18);--biome-b:rgba(42,22,76,.44)}
+.battle-panel .arena.boss{
+  border-color:#f8bb6b;
+  box-shadow:inset 0 0 35px #ffd78230,0 0 0 1px #8e614459;
+}
+.battle-panel .scene-enemy{
+  position:relative;z-index:1;
+  object-position:center bottom;image-rendering:pixelated;
+  transition:filter .18s,transform .18s;
+}
+.battle-panel .arena[data-enemy="slime"] .scene-enemy{
+  filter:drop-shadow(0 9px 1px #193e3777) drop-shadow(0 0 14px #7de6a93b)
+}
+.battle-panel .arena[data-enemy="bat"] .scene-enemy{
+  filter:drop-shadow(0 8px 1px #14172b88) drop-shadow(0 0 13px #aa7ce44a)
+}
+.battle-panel .arena[data-enemy="golem"] .scene-enemy{
+  filter:drop-shadow(0 9px 1px #151d2994) drop-shadow(0 0 14px #8accc74a)
+}
+.battle-panel .arena[data-enemy="guardian"] .scene-enemy{
+  filter:drop-shadow(0 8px 2px #18392988) drop-shadow(0 0 18px #61e9ab9e)
+}
+.battle-panel .arena[data-enemy="titan"] .scene-enemy{
+  filter:drop-shadow(0 8px 2px #29102f99) drop-shadow(0 0 19px #f063a581)
+}
+.battle-panel .arena.hit .scene-enemy{
+  animation:enemy-shake .30s ease-out both;
+  filter:brightness(1.8) drop-shadow(0 0 14px #ffb3ac)
+}
+.battle-panel .arena.critical{box-shadow:inset 0 0 24px #ffcf64a1,0 0 0 1px #f5bc82}
+.battle-panel .arena .hit-number{
+  top:32%;left:66%;z-index:4;font-size:clamp(19px,2.7vw,31px)
+}
+.battle-panel .hit-number.critical{color:#ffe070;text-shadow:0 2px 2px #432010,0 0 12px #f7b63a}
+.battle-panel .impact-burst{
+  position:absolute;z-index:3;top:45%;left:68%;width:20px;height:20px;
+  pointer-events:none;border:3px solid #fff2b2;border-radius:50%;opacity:0;
+  box-shadow:0 0 8px #faca94,0 0 22px #f2aa7b80
+}
+.battle-panel .impact-burst.show{animation:hit-ring .34s ease-out both}
+.battle-panel .wave-notice{
+  position:absolute;z-index:5;top:15%;left:50%;max-width:95%;
+  transform:translate(-50%,-5px);pointer-events:none;opacity:0;
+  background:#231b34eb;color:#ffdc98;border:1px solid #ffd08b8c;
+  border-radius:9px;padding:6px 12px;font-size:clamp(11px,1.4vw,15px);
+  text-align:center;font-weight:800;letter-spacing:.035em;text-wrap:balance
+}
+.battle-panel .wave-notice.show{animation:wave-notice 1.1s ease-out both}
+@keyframes enemy-shake{
+  0%{transform:translateX(0)}25%{transform:translateX(-5px)}
+  55%{transform:translateX(5px)}100%{transform:translateX(0)}
+}
+@keyframes hit-ring{
+  0%{transform:translate(-50%,-50%) scale(.55);opacity:1}
+  100%{transform:translate(-50%,-50%) scale(4);opacity:0}
+}
+@keyframes wave-notice{
+  0%{opacity:0;transform:translate(-50%,-10px)}
+  14%,75%{opacity:1;transform:translate(-50%,0)}
+  100%{opacity:0;transform:translate(-50%,-7px)}
+}
+@media(max-width:899px){
+  .battle-panel .arena .hit-number{left:69%;top:29%}
+  .battle-panel .wave-notice{font-size:12px;top:9%;padding:5px 8px}
+}
+@media(prefers-reduced-motion:reduce){
+ .battle-panel .arena.hit .scene-enemy,
+ .battle-panel .impact-burst.show,
+ .battle-panel .wave-notice.show{animation:none}
+ .battle-panel .wave-notice.show{opacity:1}
+ .battle-panel .impact-burst.show{opacity:0}
+}

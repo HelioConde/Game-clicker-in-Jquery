@@ -214,3 +214,51 @@ test("arena preserva sprites visíveis sem aumentar o documento",async ({page},i
   expect(m.hero.top).toBeGreaterThanOrEqual(m.arena.top-2);
   expect(m.doc).toBeLessThanOrEqual(m.screen+2);
 });
+
+test("Etapa 6 carrega monstros e chefes diferentes, inclusive a fase 21", async ({browser}) => {
+  for (const [stage,id,src,biome] of [
+    [1,"shadow","monstro.gif","bosque"],
+    [4,"slime","slime-bosque.svg","bosque"],
+    [7,"bat","morcego-crepusculo.svg","bosque"],
+    [10,"guardian","guardiao-bosque.svg","bosque"],
+    [11,"golem","golem-pedra.svg","eclipse"],
+    [20,"titan","colosso-eclipse.svg","eclipse"],
+    [21,"golem","golem-pedra.svg","montanha"]
+  ]) {
+    const context=await browser.newContext();
+    const page=await context.newPage();
+    try {
+      await openWithSave(page,{stage});
+      await expect(page.locator("#stageLabel")).toHaveText("FASE "+stage);
+      await expect(page.locator("#enemyName")).not.toBeEmpty();
+      await expect(page.locator("#attackButton")).toHaveAttribute("data-enemy",id);
+      await expect(page.locator("#attackButton")).toHaveAttribute("data-biome",biome);
+      await expect(page.locator("#enimei")).toHaveAttribute("src",new RegExp(src.replace(".","\\.")+"$"));
+      if(stage%10===0) await expect(page.locator("#bossBadge")).toBeVisible();
+      else await expect(page.locator("#bossBadge")).toBeHidden();
+      await expect.poll(()=>page.locator("#enimei").evaluate(img=>img.complete&&img.naturalWidth>0)).toBe(true);
+      const screen=await page.evaluate(()=>({height:document.documentElement.scrollHeight,viewport:innerHeight}));
+      expect(screen.height).toBeLessThanOrEqual(screen.viewport+2);
+    } finally {await context.close();}
+  }
+});
+
+test("novo monstro permanece visível após o golpe, sem voltar ao GIF antigo", async ({page}) => {
+  await openWithSave(page,{stage:4});
+  await expect(page.locator("#enimei")).toHaveAttribute("src",/slime-bosque\.svg$/);
+  await page.locator("#attackButton").click();
+  await expect(page.locator("#hitNumber")).toContainText("-");
+  await expect(page.locator("#impactBurst")).toHaveClass(/show/);
+  await page.waitForTimeout(480);
+  await expect(page.locator("#enimei")).toHaveAttribute("src",/slime-bosque\.svg$/);
+  await expect(page.locator("#attackButton")).toHaveAttribute("data-enemy","slime");
+});
+
+test("chefe usa sprite exclusivo e não remove habilidades da tela",async ({page})=>{
+  await openWithSave(page,{stage:10});
+  await expect(page.locator("#bossBadge")).toBeVisible();
+  await expect(page.locator("#attackButton")).toHaveClass(/boss/);
+  await expect(page.locator("#enimei")).toHaveAttribute("src",/guardiao-bosque\.svg$/);
+  await expect(page.locator("#smashSkill")).toBeVisible();
+  await expect(page.locator("#furySkill")).toBeVisible();
+});

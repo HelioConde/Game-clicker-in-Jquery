@@ -123,6 +123,14 @@
   }
   function renderEnemy() {
     const enemy = core.enemyFor(state.stage);
+    const arena = $("attackButton");
+    const sprite = $("enimei");
+    if (sprite.dataset.enemyStage !== String(enemy.stage)) {
+      sprite.src = enemy.sprite;
+      sprite.dataset.enemyStage = String(enemy.stage);
+      arena.dataset.biome = enemy.biome;
+      arena.dataset.enemy = enemy.id;
+    }
     $("stageLabel").textContent = "FASE " + number(state.stage);
     $("enemyName").textContent = enemy.name;
     $("bossBadge").hidden = !enemy.boss;
@@ -135,6 +143,32 @@
   }
   function renderAll() { renderStats(); renderShop(); renderUpgrades(); renderEnemy(); renderSkills(); }
   function message(text) { $("battleMessage").textContent = text; }
+  let waveTimer = null;
+  function showWaveNotice(enemy, bossDown = false) {
+    const notice = $("waveNotice");
+    notice.textContent = bossDown ? "CHEFE DERROTADO!" :
+      enemy.boss ? "CHEFE · " + enemy.name : "FASE " + enemy.stage + " · " + enemy.name;
+    notice.classList.remove("show");
+    void notice.offsetWidth;
+    notice.classList.add("show");
+    clearTimeout(waveTimer);
+    waveTimer = setTimeout(() => notice.classList.remove("show"), 1100);
+  }
+  function animateImpact(points, critical = false) {
+    const arena = $("attackButton");
+    const label = $("hitNumber");
+    label.textContent = (critical ? "CRÍTICO! " : "") + "-" + number(points);
+    label.classList.remove("show", "critical");
+    arena.classList.remove("hit", "critical");
+    const burst = $("impactBurst");
+    burst.classList.remove("show");
+    void label.offsetWidth;
+    label.classList.add("show");
+    if (critical) label.classList.add("critical");
+    arena.classList.add("hit");
+    if (critical) arena.classList.add("critical");
+    burst.classList.add("show");
+  }
   function onResults(result) {
     if (!result.kills) return;
     sound("dinheiroSom");
@@ -146,6 +180,8 @@
     renderShop();
     renderUpgrades();
     renderStats();
+    const next = core.enemyFor(state.stage);
+    showWaveNotice(next, result.bosses > 0);
     save();
   }
   core.WEAPONS.forEach((weapon, index) => {
@@ -170,14 +206,8 @@
     const damage = hit.damage;
     const result = hit.result;
     $("personagem").src = "img/attack.gif";
-    $("enimei").src = "img/monstro_dano.png";
+    animateImpact(damage, hit.critical);
     const arena = $("attackButton");
-    arena.classList.add("hit");
-    const hitNumber = $("hitNumber");
-    hitNumber.textContent = (hit.critical ? "CRÍTICO! " : "") + "-" + number(damage);
-    hitNumber.classList.remove("show");
-    void hitNumber.offsetWidth;
-    hitNumber.classList.add("show");
     sound("espada");
     renderEnemy();
     onResults(result);
@@ -185,8 +215,7 @@
     clearTimeout(attackTimer);
     attackTimer = setTimeout(() => {
       $("personagem").src = "img/stop.png";
-      $("enimei").src = "img/monstro.gif";
-      arena.classList.remove("hit");
+      arena.classList.remove("hit", "critical");
       animating = false;
     }, 350);
   }
@@ -198,6 +227,7 @@
       sound("espada");
       if (key === "smash") {
         message("Golpe poderoso! " + number(effect.damage) + " de dano.");
+        animateImpact(effect.damage, true);
         renderEnemy();
         onResults(effect.result);
       } else {

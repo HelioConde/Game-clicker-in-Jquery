@@ -47,11 +47,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Preparar apenas arquivos públicos
         run: |
-          mkdir -p dist/css dist/js dist/img dist/efeito
+          mkdir -p dist/css dist/js dist/img dist/img/inimigos dist/efeito
           cp index.html dist/index.html
           cp css/style.css dist/css/style.css
           cp js/game-core.js js/script.js dist/js/
           cp img/*.png img/*.gif img/*.webp dist/img/
+          cp img/inimigos/*.svg dist/img/inimigos/
           cp efeito/espada.mp3 efeito/dinheiro.mp3 efeito/erro.mp3 dist/efeito/
           touch dist/.nojekyll
       - uses: actions/configure-pages@v5

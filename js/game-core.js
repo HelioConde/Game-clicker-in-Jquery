@@ -32,11 +32,33 @@
     const n=Number(value);
     return Number.isSafeInteger(n) && n > 0 && n < 9e15 ? n : 0;
   };
+  // A aparência é determinada pela fase (e nunca por sorte): atualizar um save
+  // antigo mantém o mesmo inimigo, HP, recompensa e chefe daquela fase.
+  const ENEMIES = Object.freeze({
+    shadow:{name:"Criatura Sombria",sprite:"img/monstro.gif"},
+    slime:{name:"Slime do Bosque",sprite:"img/inimigos/slime-bosque.svg"},
+    bat:{name:"Morcego do Crepúsculo",sprite:"img/inimigos/morcego-crepusculo.svg"},
+    golem:{name:"Golem de Pedra",sprite:"img/inimigos/golem-pedra.svg"},
+    guardian:{name:"Guardião do Bosque",sprite:"img/inimigos/guardiao-bosque.svg"},
+    titan:{name:"Colosso do Eclipse",sprite:"img/inimigos/colosso-eclipse.svg"}
+  });
+  const REGIONS = Object.freeze(["bosque","eclipse","montanha","crepusculo"]);
+  const ROSTERS = Object.freeze([
+    ["shadow","slime","bat"],
+    ["golem","bat","slime"],
+    ["golem","slime","shadow"],
+    ["bat","shadow","golem"]
+  ]);
   const enemyFor = stage => {
     const wave=stageNumber(stage), boss=wave%10===0;
+    const regionIndex=Math.floor((wave-1)/10)%REGIONS.length;
+    const slot=(wave-1)%10;
+    const id=boss ? (regionIndex%2===0?"guardian":"titan")
+      :ROSTERS[regionIndex][Math.floor(slot/3)];
+    const meta=ENEMIES[id];
     return {
-      stage:wave,boss,
-      name:boss?"Guardião Sombrio":"Criatura Sombria",
+      stage:wave,boss,id,name:meta.name,sprite:meta.sprite,
+      biome:REGIONS[regionIndex],
       hp:Math.min(MAX,Math.ceil(12*Math.pow(1.22,wave-1)*(boss?3.5:1))),
       reward:Math.min(MAX,Math.ceil(10*Math.pow(1.2,wave-1)*(boss?6:1)))
     };
@@ -161,6 +183,6 @@
     s.offlineEarned=Math.min(MAX,s.offlineEarned+gold);
     return {seconds:Math.floor(seconds),gold};
   }
-  return {WEAPONS,UPGRADES,SKILLS,normalize,enemyFor,clickPower,dps,critChance,
+  return {WEAPONS,UPGRADES,SKILLS,ENEMIES,REGIONS,normalize,enemyFor,clickPower,dps,critChance,
     price,upgradePrice,buy,buyUpgrade,damage,strike,activateSkill,furyActive,claimOffline};
 });
