@@ -22,6 +22,16 @@ Jogo web de clique e combate originalmente feito em jQuery em 2022. Esta branch 
 - Bônus offline: 20% do DPS por segundo, a partir de 60s ausente e limite de 8 horas; não avança fases offline.
 - Sem conta, banco de dados ou servidor necessários.
 
+## Etapa 6 — Diversidade de inimigos e cenários
+
+- Inimigos alternados por fase: **Criatura Sombria** (sprite legado), **Slime do Bosque**, **Morcego do Crepúsculo** e **Golem de Pedra**.
+- Chefes com aparência exclusiva: **Guardião do Bosque** (fase 10) e **Colosso do Eclipse** (fase 20); variantes repetem em ciclos regionais.
+- Cenários com gradações de cor por região: bosque, eclipse, montanha e crepúsculo.
+- Efeitos de impacto, dano crítico, avisos de mudança de fase e brilho especial de chefes.
+- Os cinco novos sprites são SVGs pixelados disponíveis em `img/inimigos/`, sem scripts nem recursos externos; os sprites legados são preservados.
+- A aparência é **determinística a partir da fase**. Salvamentos V3 continuam válidos e HP, drops, níveis, preços e DPS não foram alterados.
+- Layout continua limitado a **uma tela** com rolagem exclusivamente dentro dos painéis; o workflow do GitHub Pages copia também os novos SVGs.
+
 ## Jogar localmente
 
 Abra `index.html` em um navegador moderno. Se preferir, sirva a pasta com um servidor HTTP simples:
