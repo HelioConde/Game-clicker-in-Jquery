@@ -129,3 +129,151 @@ h2{margin:2px 0 12px;font-size:clamp(20px,2vw,26px)}
  .upgrade-heading{font-size:12px}
 }
 @media(max-width:360px){.upgrades-list,.skill-bar{grid-template-columns:1fr}}
+
+
+/* Layout de jogo em UMA TELA (desktop e mobile).
+   A viewport pertence ao jogo; somente listas/painéis internos podem rolar. */
+html,body{width:100%;height:100%;overflow:hidden}
+body{min-height:0}
+.app{
+  width:100%;max-width:1600px;height:100vh;height:100dvh;min-height:0;
+  padding:10px 14px 7px;display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;gap:9px;overflow:hidden
+}
+.topbar{min-height:0;margin:0;padding:3px 5px 9px;gap:12px}
+.topbar h1{font-size:clamp(23px,2.3vw,31px)}
+.topbar .eyebrow{font-size:10px}
+.topbar .secondary-button{padding:8px 11px;font-size:13px}
+.topbar .save-status{font-size:11px}
+.game-layout{
+  height:100%;min-height:0;min-width:0;
+  grid-template-columns:minmax(195px,245px) minmax(0,1fr) minmax(220px,285px);
+  gap:12px;align-items:stretch
+}
+.panel,.battle-panel{min-height:0;max-height:100%;border-radius:13px}
+.progress-panel{
+  padding:13px;gap:11px;overflow-x:hidden;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:#766789 transparent;
+  overscroll-behavior:contain
+}
+.progress-panel .wallet{padding:10px 12px}
+.progress-panel .wallet-label{font-size:12px}
+.progress-panel #valor{font-size:clamp(22px,2vw,30px)}
+.progress-panel .stat-block{gap:4px}
+.progress-panel .stat-block>div{padding-bottom:5px;gap:7px}
+.progress-panel .stat-block span{font-size:12px}
+.progress-panel .stat-block strong{font-size:14px}
+.progress-panel .tip{padding:10px;margin-top:0}
+.progress-panel .tip h2{font-size:14px}
+.progress-panel .tip p{font-size:12px}
+.progress-panel .upgrades{padding-top:10px}
+.progress-panel .upgrades-list{gap:7px}
+.progress-panel .upgrade-button{padding:8px 10px}
+.shop-panel{padding:13px;display:flex;flex-direction:column;overflow:hidden}
+.shop-panel .shop-head,.shop-panel .shop-help{flex-shrink:0}
+.shop-panel h2{font-size:21px;margin:0}
+.shop-panel .shop-help{font-size:12px;line-height:1.4;margin:2px 0 9px}
+.shop-panel .items{
+  display:flex;flex-direction:column;min-height:0;max-height:none;
+  flex:1;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;
+  padding-right:3px;gap:6px
+}
+.shop-panel .item{min-height:58px;padding:7px;gap:1px 7px;flex-shrink:0}
+.shop-panel .item img{width:36px;height:36px}
+.shop-panel .item{grid-template-columns:36px minmax(0,1fr) auto}
+.shop-panel .item .item-name{font-size:12px}
+.shop-panel .item strong{font-size:12px}
+.battle-panel{
+  padding:10px;display:flex;flex-direction:column;gap:8px;
+  overflow:hidden;min-height:0
+}
+.battle-panel .enemy-header{padding:0 4px;flex:none}
+.battle-panel .enemy-header h2{font-size:clamp(19px,2vw,25px);margin:5px 0 6px}
+.battle-panel .stage-label,.battle-panel .boss-badge{padding:3px 8px;font-size:10px}
+.battle-panel .hp-label{margin-bottom:4px;font-size:12px}
+.battle-panel #enemyHpBar{height:13px}
+.battle-panel .reward-label{margin:5px 0 0;font-size:12px}
+.battle-panel .arena{
+  flex:1 1 0;min-height:0;height:0;padding:6px 8px 27px;
+  border-radius:10px;overflow:hidden
+}
+.battle-panel .arena-scene{height:100%;min-height:0;align-items:center}
+.battle-panel .scene-character,.battle-panel .scene-enemy{
+  height:min(100%,clamp(115px,25dvh,230px));width:min(42%,195px)
+}
+.battle-panel .attack-prompt{bottom:7px;font-size:11px}
+.battle-panel .skill-bar{flex:none;margin:0;gap:8px}
+.battle-panel .skill-button{min-height:42px;padding:6px;font-size:12px}
+.battle-panel .battle-message{
+  flex:none;min-height:18px;max-height:34px;overflow-y:auto;margin:0 3px;
+  line-height:1.35;font-size:12px
+}
+.battle-panel .offline-message{flex:none;padding:6px 9px;font-size:11px;margin:0}
+.footer{margin:0;padding:0 3px;font-size:11px;line-height:1.4}
+.mobile-nav{display:none}
+
+/* A partir daqui, tablet e celular usam 3 abas dentro da própria viewport.
+   O combate é a tela inicial; herói e loja ficam a um toque, sem rolar a página. */
+@media(max-width:899px){
+  .app{padding:8px 9px 7px;grid-template-rows:auto auto minmax(0,1fr);gap:8px}
+  .topbar{padding:2px 4px 7px}
+  .topbar h1{font-size:clamp(21px,4vw,28px)}
+  .topbar .eyebrow{font-size:9px}
+  .topbar-actions{gap:6px;align-items:flex-end}
+  .topbar .save-status{font-size:10px}
+  .topbar .secondary-button{padding:6px 9px;font-size:12px}
+  .mobile-nav{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px;min-height:42px
+  }
+  .view-tab{
+    border:1px solid #695779;border-radius:9px;background:#2d263e;
+    color:var(--text);font-size:13px;font-weight:700;cursor:pointer;
+    min-height:42px;padding:6px
+  }
+  .view-tab.is-active{background:#5b427a;border-color:var(--gold);color:#ffe7ae}
+  .game-layout{display:block;position:relative;height:100%;min-height:0;overflow:hidden}
+  .game-layout>.panel,.game-layout>.battle-panel{
+    width:100%;height:100%;min-height:0;max-height:none;position:relative;
+    inset:auto;grid-column:auto;box-sizing:border-box
+  }
+  .game-layout>.progress-panel,.game-layout>.shop-panel{display:none}
+  .game-layout>.battle-panel{display:flex}
+  .app[data-view="stats"] .progress-panel{display:flex}
+  .app[data-view="stats"] .battle-panel{display:none}
+  .app[data-view="shop"] .shop-panel{display:flex}
+  .app[data-view="shop"] .battle-panel{display:none}
+  .progress-panel{padding:15px;overflow-y:auto;gap:13px}
+  .progress-panel .stat-block{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .progress-panel .stat-block>div{display:flex;flex-direction:column;gap:0}
+  .progress-panel .upgrades-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .shop-panel{padding:15px}
+  .shop-panel .items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start}
+  .shop-panel .item{display:grid;min-width:0;min-height:66px;grid-template-columns:36px minmax(0,1fr)}
+  .shop-panel .item img{grid-row:1/3}
+  .shop-panel .item strong{grid-column:2;grid-row:2}
+  .shop-panel .item small{grid-column:1/3}
+  .battle-panel{order:0;padding:9px}
+  .battle-panel .arena{min-height:0}
+  .battle-panel .scene-character,.battle-panel .scene-enemy{
+    height:min(100%,clamp(105px,28dvh,210px))
+  }
+  .battle-panel .arena-scene{min-height:0}
+  .battle-panel .skill-button{min-height:41px}
+  .footer{display:none}
+}
+@media(max-width:360px){
+  .topbar .save-status{display:none}
+  .progress-panel .upgrades-list{grid-template-columns:1fr}
+  .battle-panel .skill-button{font-size:11px}
+}
+@media(max-height:540px){
+  .app{padding-top:4px;padding-bottom:3px;gap:4px}
+  .topbar{padding:0 4px 3px}
+  .topbar .eyebrow{display:none}
+  .battle-panel{gap:4px;padding:7px}
+  .battle-panel .enemy-header h2{margin:1px 0 4px;font-size:18px}
+  .battle-panel .skill-button{min-height:35px}
+  .battle-panel .battle-message{max-height:25px}
+  .footer{display:none}
+}

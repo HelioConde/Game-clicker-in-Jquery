@@ -15,6 +15,22 @@
     if (audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
   };
   const status = $("saveStatus");
+  // Em telas pequenas, uma área por vez mantém o combate inteiro visível.
+  // Não altera a partida, o save nem a disposição com três colunas no desktop.
+  const app = document.querySelector(".app");
+  const viewTabs = Array.from(document.querySelectorAll(".view-tab"));
+  function selectView(view) {
+    if (!["battle", "stats", "shop"].includes(view)) return;
+    app.dataset.view = view;
+    for (const button of viewTabs) {
+      const current = button.dataset.view === view;
+      button.classList.toggle("is-active", current);
+      button.setAttribute("aria-pressed", String(current));
+    }
+    if (view === "battle") $("attackButton").focus({ preventScroll: true });
+  }
+  viewTabs.forEach(button => button.addEventListener("click", () => selectView(button.dataset.view)));
+
   function save() {
     try {
       state.lastSeen = Date.now();

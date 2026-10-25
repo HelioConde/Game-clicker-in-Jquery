@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="app">
+  <div class="app" data-view="battle">
     <header class="topbar">
       <div>
         <div class="eyebrow">RPG INCREMENTAL · ETAPA 3</div>
@@ -20,6 +20,11 @@
         <button id="config" class="secondary-button" type="button" aria-pressed="false">Som: ligado</button>
       </div>
     </header>
+    <nav class="mobile-nav" aria-label="Navegação entre áreas do jogo">
+      <button class="view-tab is-active" type="button" data-view="battle" aria-pressed="true"><span aria-hidden="true">⚔️</span> Combate</button>
+      <button class="view-tab" type="button" data-view="stats" aria-pressed="false"><span aria-hidden="true">📊</span> Herói</button>
+      <button class="view-tab" type="button" data-view="shop" aria-pressed="false"><span aria-hidden="true">🛒</span> Loja</button>
+    </nav>
     <main class="game-layout">
       <aside class="panel progress-panel" aria-label="Seu progresso">
         <div class="panel-title">AVENTUREIRO</div>
