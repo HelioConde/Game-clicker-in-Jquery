@@ -1,10 +1,34 @@
-# Game Clicker — RPG incremental
+<div align="center">
+  <h1>⚔️ Game Clicker — RPG Incremental</h1>
+  <p><strong>Derrote monstros, melhore seu arsenal e avance por fases em um clicker com combate e progressão idle.</strong></p>
+  <p>
+    <a href="https://helioconde.github.io/Game-clicker-in-Jquery/"><img alt="Jogar no navegador" src="https://img.shields.io/badge/JOGAR%20AGORA-GitHub%20Pages-2563eb?style=for-the-badge"></a>
+    <img alt="Status" src="https://img.shields.io/badge/Status-prot%C3%B3tipo%20jog%C3%A1vel-64748b?style=for-the-badge">
+  </p>
+  <p><a href="https://helioconde.github.io/Game-clicker-in-Jquery/"><strong>Abrir o jogo</strong></a> · <a href="#jogar-localmente"><strong>Rodar localmente</strong></a> · <a href="#rodar-testes"><strong>Testes</strong></a></p>
+</div>
 
-[**Jogar agora no navegador**](https://helioconde.github.io/Game-clicker-in-Jquery/) · [**Ver código**](https://github.com/HelioConde/Game-clicker-in-Jquery)
+---
 
-Jogo web de clique e combate originalmente feito em jQuery em 2022. Esta branch recupera a ideia original e adiciona uma base independente do jQuery, preservando as 10 armas e os arquivos de arte e áudio.
+## Sobre o jogo
 
-> **Status:** Etapas 1–4 integradas na branch `main` e publicadas no GitHub Pages. Testes automatizados aprovados; inspeção visual humana em dispositivos físicos ainda é recomendada.
+O projeto começou como um **clicker em jQuery em 2022** e foi modernizado mantendo a identidade, as dez armas originais e as artes e sons. Hoje usa JavaScript modular para controlar combate, economia, evolução e salvamento.
+
+**Como jogar:** clique ou toque para atacar, acumule moedas ao derrotar inimigos, compre armas e melhorias e enfrente um chefe a cada dez fases. Seu dano por segundo (**DPS**) também age automaticamente.
+
+| Sistema | Como funciona |
+| --- | --- |
+| **Combate** | Dano por clique, DPS, críticos e habilidades com recarga |
+| **Progressão** | Fases e chefes; recompensas ao derrotar inimigos |
+| **Arsenal** | Dez armas com evolução de custo e dano |
+| **Melhorias** | Força, Autômato, Precisão e Fortuna |
+| **Idle** | Recompensa parcial pelo tempo fora do jogo, com limite definido |
+| **Persistência** | Save no navegador e migração de dados de versões anteriores |
+| **Interface** | Desktop em uma única viewport; mobile com abas Combate, Herói e Loja |
+
+**Status:** protótipo web publicado, com testes automáticos documentados. A experiência em dispositivos físicos diferentes ainda merece revisão manual.
+
+> **Regra de interface:** a arena principal deve caber em uma tela sem rolagem global. Arsenal e melhorias podem ter rolagem interna. Esse comportamento foi uma prioridade da modernização.
 
 ## Funcionalidades
 
@@ -79,7 +103,7 @@ Esta evolução substitui a lógica jQuery por JavaScript modular, mas mantém o
 
 Desenvolvido por [Hélio Conde](https://github.com/HelioConde).
 
-## Jogar publicado e acompanhar QA
+## Publicação e evidências de QA
 
 - [Abrir Game Clicker](https://helioconde.github.io/Game-clicker-in-Jquery/)
 - [Deploy oficial no GitHub Actions](https://github.com/HelioConde/Game-clicker-in-Jquery/actions/runs/40174968289)
