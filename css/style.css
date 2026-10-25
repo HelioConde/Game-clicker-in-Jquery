@@ -277,3 +277,81 @@ body{min-height:0}
   .battle-panel .battle-message{max-height:25px}
   .footer{display:none}
 }
+
+
+/* Polimento v1: moedas independentes de fontes, ajuda expansível e upgrades com rolagem isolada. */
+#valor::before{
+  content:"";display:inline-block;width:.74em;height:.74em;vertical-align:-.045em;
+  margin-right:.23em;box-sizing:border-box;border-radius:50%;
+  border:2px solid #ffdd87;
+  background:radial-gradient(circle at 28% 24%,#fff6cc 0 8%,#ffe48d 22%,#f4b539 55%,#ae661d 100%);
+  box-shadow:inset 0 0 0 2px #ab6b27,0 1px 3px #0007
+}
+.coin-icon{
+  width:1em;height:1em;flex:none;display:inline-block;vertical-align:-.16em;
+  box-sizing:border-box;border:2px solid #ffdb7b;border-radius:50%;
+  background:radial-gradient(circle at 30% 24%,#fff6c5 0 10%,#f9d064 36%,#db8a25 85%);
+  box-shadow:inset 0 0 0 2px #a86b24,0 1px 2px #0005;
+  margin-right:.32em
+}
+.item .price{display:inline-flex;align-items:center;justify-content:flex-end;white-space:nowrap;gap:0}
+.upgrade-button strong{display:inline-flex;align-items:center;gap:0}
+.progress-panel{
+  overflow:hidden;gap:7px
+}
+.progress-panel > .panel-title{flex:none}
+.progress-panel .wallet{flex:none;padding:8px 11px}
+.progress-panel .stat-block{flex:none;gap:2px}
+.progress-panel .stat-block>div{padding-bottom:4px}
+.progress-panel .tip{
+  flex:none;margin:0;padding:0;overflow:visible
+}
+.progress-panel .tip summary{
+  cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;
+  gap:7px;padding:7px 10px;font-weight:750;font-size:13px;
+  border-radius:10px
+}
+.progress-panel .tip summary::-webkit-details-marker{display:none}
+.progress-panel .tip summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.progress-panel .tip summary:hover{background:#4a3c5d}
+.progress-panel .tip .tip-caret{
+  display:inline-block;flex:none;height:7px;width:7px;border-right:2px solid currentColor;
+  border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .14s
+}
+.progress-panel .tip[open] .tip-caret{transform:rotate(225deg)}
+.progress-panel .tip p{padding:0 10px 9px;line-height:1.45;font-size:11px}
+.progress-panel .upgrades{
+  flex:1 1 100px;min-height:88px;display:flex;flex-direction:column;gap:6px;
+  overflow:hidden;padding-top:8px
+}
+.progress-panel .upgrades > .panel-title{flex:none}
+.progress-panel .upgrades-list{
+  flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:#78658b transparent;padding:1px 4px 3px 0;gap:6px
+}
+.progress-panel .upgrade-button{padding:7px 9px;flex-shrink:0}
+.battle-panel .arena-scene{
+  align-items:flex-end;padding-bottom:clamp(12px,5dvh,55px);gap:1.5%
+}
+.battle-panel .scene-character,.battle-panel .scene-enemy{
+  height:min(100%,clamp(148px,34dvh,270px));width:min(45%,215px);
+  object-fit:contain;object-position:center bottom;image-rendering:pixelated
+}
+.battle-panel .arena.boss .scene-enemy{transform:scale(1.13)}
+@media(max-width:899px){
+  .game-layout>.progress-panel{
+    overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;gap:11px
+  }
+  .progress-panel .upgrades{flex:0 0 auto;min-height:0;overflow:visible}
+  .progress-panel .upgrades-list{flex:initial;overflow:visible;padding:0}
+  .battle-panel .arena-scene{padding-bottom:clamp(10px,3dvh,30px)}
+  .battle-panel .scene-character,.battle-panel .scene-enemy{
+    height:min(100%,clamp(120px,31dvh,235px));width:min(45%,215px)
+  }
+}
+@media(max-height:540px) and (min-width:900px){
+  .progress-panel .wallet{padding:5px 9px}
+  .progress-panel .tip summary{padding:5px 8px}
+  .battle-panel .arena-scene{padding-bottom:10px}
+  .battle-panel .scene-character,.battle-panel .scene-enemy{height:min(100%,33dvh)}
+}
