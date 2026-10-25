@@ -3,7 +3,7 @@ name: Publicar Game Clicker no GitHub Pages
 on:
   push:
     branches:
-      - feat/etapa-1-recuperacao
+      - main
     paths:
       - 'index.html'
       - 'css/**'
@@ -37,6 +37,7 @@ jobs:
           node --test tests/game-core.test.cjs
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: validate
     runs-on: ubuntu-latest
     environment:
