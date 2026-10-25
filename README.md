@@ -46,6 +46,13 @@ O projeto começou como um **clicker em jQuery em 2022** e foi modernizado mante
 - Bônus offline: 20% do DPS por segundo, a partir de 60s ausente e limite de 8 horas; não avança fases offline.
 - Sem conta, banco de dados ou servidor necessários.
 
+## Etapa 8.1 — Ajustes após a captura da fase 32
+
+- Corrigida a escala individual dos sprites: morcego e slime pequenos, golem intermediário, chefes maiores. A linha de base do herói e dos inimigos é compartilhada.
+- Corrigido o contraste dos equipamentos e das melhorias indisponíveis, sem permitir compras sem moedas.
+- Recargas mostram explicitamente `Recarrega em Ns`, barra de progresso e segundos restantes de Fúria.
+- A interface continua limitada a uma tela, com testes automatizados de proporções, alturas, legibilidade e cooldown em desktop/mobile. Nenhum dado de progresso ou regra de combate foi alterado.
+
 ## Etapa 8 — Spritesheets, chefes e defesa
 
 - Cada um dos cinco novos inimigos possui uma **spritesheet SVG horizontal de quatro quadros** (`img/inimigos/*-sheet.svg`). São poses derivadas das artes vetoriais existentes, com pequenas variações de escala/altura; não são desenhos inteiramente novos.
