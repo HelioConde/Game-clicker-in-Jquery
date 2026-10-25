@@ -522,3 +522,65 @@ body{min-height:0}
  .battle-panel .defeat-ghost.boss.show {animation:none;visibility:hidden}
  .battle-panel .victory-banner.show {animation:none;opacity:1;transform:translate(-50%,-50%)}
 }
+
+
+/* Etapa 8: spritesheet 4 quadros dentro do mesmo espaço da arena. */
+.battle-panel .arena-scene .enemy-frame{
+  width:min(45%,215px);height:min(100%,clamp(148px,34dvh,270px));
+  min-width:0;flex:0 1 auto;display:block;position:relative;
+  overflow:hidden;align-self:flex-end;pointer-events:none;
+  filter:drop-shadow(0 7px 3px #10152290)
+}
+.battle-panel .enemy-frame .scene-enemy{
+  width:100%;height:100%;max-width:none;display:block;
+  object-fit:contain;object-position:center bottom;
+}
+.battle-panel .enemy-frame[data-sheet="true"] .scene-enemy{opacity:0}
+.battle-panel .enemy-frame[data-sheet="true"]::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:var(--enemy-spritesheet);
+  background-repeat:no-repeat;background-size:400% 100%;
+  background-position:0% 0%;image-rendering:pixelated;
+  animation:enemy-sprites-4 1.2s linear infinite;
+}
+.battle-panel .arena[data-enemy="slime"] .enemy-frame[data-sheet="true"]::before{animation-duration:.96s}
+.battle-panel .arena[data-enemy="bat"] .enemy-frame[data-sheet="true"]::before{animation-duration:.68s}
+.battle-panel .arena[data-enemy="golem"] .enemy-frame[data-sheet="true"]::before{animation-duration:1.7s}
+.battle-panel .arena.boss .enemy-frame[data-sheet="true"]::before{animation-duration:1.45s}
+@keyframes enemy-sprites-4{
+  0%,24.99%{background-position:0% 0%}
+  25%,49.99%{background-position:33.333333% 0%}
+  50%,74.99%{background-position:66.666667% 0%}
+  75%,100%{background-position:100% 0%}
+}
+.battle-panel .arena.boss .enemy-frame{transform:scale(1.12)}
+.battle-panel .arena.hit .enemy-frame{animation:enemy-shake .3s ease-out both}
+.battle-panel .arena.hit .enemy-frame::before{filter:brightness(1.8)}
+.battle-panel .arena.boss .enemy-frame::before{filter:drop-shadow(0 0 7px #ffc286)}
+.battle-panel .arena .boss-telegraph{
+  position:absolute;z-index:5;top:9%;left:50%;transform:translateX(-50%);
+  display:none;width:max-content;max-width:94%;
+  padding:5px 10px;border-radius:8px;
+  background:#752a36ee;color:#fff1bb;border:1px solid #ffc175;
+  font-size:clamp(11px,1.4vw,14px);font-weight:800;text-align:center;pointer-events:none
+}
+.battle-panel .arena.boss-warning{border-color:#ffab66;box-shadow:inset 0 0 24px #ff523977}
+.battle-panel .arena.boss-warning .boss-telegraph{display:block;animation:boss-warning .55s ease-in-out infinite alternate}
+.battle-panel .arena.boss-stunned .scene-character{filter:grayscale(.75) brightness(.75)}
+.battle-panel .skill-bar.has-guard{grid-template-columns:repeat(3,minmax(0,1fr))}
+.battle-panel .boss-guard{border-color:#ffbd69;background:#5b3a33;color:#fff1d3}
+.battle-panel .boss-guard:not(:disabled):hover{background:#79513c}
+@keyframes boss-warning{from{opacity:.78}to{opacity:1}}
+@media(max-width:899px){
+ .battle-panel .arena-scene .enemy-frame{height:min(100%,clamp(120px,31dvh,235px))}
+ .battle-panel .skill-bar.has-guard .skill-button{font-size:clamp(10px,2.3vw,12px);padding:5px 3px}
+ .battle-panel .arena .boss-telegraph{top:6%;font-size:11px}
+}
+@media(max-height:540px) and (min-width:900px){
+ .battle-panel .arena-scene .enemy-frame{height:min(100%,33dvh)}
+}
+@media(prefers-reduced-motion:reduce){
+ .battle-panel .enemy-frame[data-sheet="true"]::before{animation:none;background-position:0% 0%}
+ .battle-panel .arena.boss-warning .boss-telegraph{animation:none}
+ .battle-panel .arena.hit .enemy-frame{animation:none}
+}
