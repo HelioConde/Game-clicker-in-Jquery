@@ -231,3 +231,28 @@
 #efeito {
     margin-top: 10%;
 }
+/* Etapa 1: interface adaptativa e estados da loja */
+#valor{font-size:clamp(18px,2vw,30px);font-weight:700;overflow-wrap:anywhere}
+#stats{font-size:14px;padding:10px}
+.item{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-height:65px;box-sizing:border-box}
+.item img{width:42px;height:42px;object-fit:contain;float:none}
+.item span{font-size:16px;flex:1;text-align:left}
+.item small{font-size:12px;width:100%}
+.item strong{font-size:15px;margin-left:auto}
+.item.affordable{background:#165b37!important}
+.item.unaffordable{background:#633039!important}
+#gameCenter:focus-visible,.item:focus-visible{outline:3px solid #f0c960;outline-offset:-4px}
+@media(max-width:800px){
+#menu{position:relative;display:flex;flex-direction:column;width:100%;height:auto;min-height:100dvh}
+#gameLeft,#gameCenter,#gameRight{position:relative;top:auto;left:auto;right:auto;bottom:auto;width:100%;box-sizing:border-box;border-width:3px}
+#gameLeft{order:1;min-height:auto;padding:12px}
+#gameCenter{order:2;min-height:350px;display:flex;align-items:center;overflow:hidden}
+#gameRight{order:3;max-height:250px;overflow-y:auto}
+#gameRight.expanded{max-height:none}
+#personagem,#enimei{width:50%;position:relative;z-index:2}
+#personagem img,#enimei img{margin-top:0;max-height:300px;object-fit:contain}
+#cenario img,#cenario2 img{position:absolute;top:0;left:0;width:100%;height:100%;margin:0;object-fit:cover}
+#cenario2 img{opacity:.35}
+#dinheiro{position:absolute;width:100%}
+#menuLoja,#configLoja{position:fixed;z-index:10;top:20%;left:5%;width:90%;height:auto}
+}
