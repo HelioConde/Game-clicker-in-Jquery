@@ -1,8 +1,10 @@
 # Game Clicker — RPG incremental
 
+[**Jogar agora no navegador**](https://helioconde.github.io/Game-clicker-in-Jquery/) · [**Ver código**](https://github.com/HelioConde/Game-clicker-in-Jquery)
+
 Jogo web de clique e combate originalmente feito em jQuery em 2022. Esta branch recupera a ideia original e adiciona uma base independente do jQuery, preservando as 10 armas e os arquivos de arte e áudio.
 
-> **Status:** Etapas 1, 2 e 3 implementadas na branch `feat/etapa-1-recuperacao`. A branch `main` mantém o projeto original. O jogo ainda precisa de QA visual/manual no navegador antes de fazer merge.
+> **Status:** Etapas 1–4 integradas na branch `main` e publicadas no GitHub Pages. Testes automatizados aprovados; inspeção visual humana em dispositivos físicos ainda é recomendada.
 
 ## Funcionalidades
 
@@ -55,7 +57,7 @@ node --test tests/game-core.test.cjs
 - [x] **Etapa 1:** recuperação de economia, loja, salvamento, navegação e mobile (código implementado).
 - [x] **Etapa 2:** combate com HP, fases, chefes, recompensas e DPS (código implementado; QA de navegador pendente).
 - [x] **Etapa 3:** Idle RPG, críticos, habilidades, melhorias e recompensas offline (código e testes implementados).
-- [ ] **Etapa 4:** publicação e QA visual de desktop/mobile no GitHub Pages.
+- [x] **Etapa 4:** GitHub Pages publicado após merge; 10 testes Playwright aprovados (Chromium desktop + dispositivo móvel emulado), screenshots e traces disponíveis nos artifacts. Revisão manual em dispositivo físico recomendada.
 
 ## Notas de compatibilidade
 
@@ -68,3 +70,11 @@ O **Game Clicker original**, criado em fevereiro de 2022, era um exercício de d
 Esta evolução substitui a lógica jQuery por JavaScript modular, mas mantém os sprites e o conceito central. Não é uma versão comercial validada. Limpar os dados do site ou mudar a origem do navegador pode apagar a partida.
 
 Desenvolvido por [Hélio Conde](https://github.com/HelioConde).
+
+## Jogar publicado e acompanhar QA
+
+- [Abrir Game Clicker](https://helioconde.github.io/Game-clicker-in-Jquery/)
+- [Deploy oficial no GitHub Actions](https://github.com/HelioConde/Game-clicker-in-Jquery/actions/runs/40174968289)
+- [QA da versão integrada na main](https://github.com/HelioConde/Game-clicker-in-Jquery/actions/runs/40174968297)
+
+**Validação:** 18 testes unitários e 10 cenários automatizados de Chromium para desktop/mobile, sem testes manuais em aparelhos físicos. A publicação é estática, sem login ou servidor de jogo.
