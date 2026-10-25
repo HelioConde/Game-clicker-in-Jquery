@@ -12,7 +12,7 @@
   <div class="app">
     <header class="topbar">
       <div>
-        <div class="eyebrow">RPG INCREMENTAL · ETAPA 2</div>
+        <div class="eyebrow">RPG INCREMENTAL · ETAPA 3</div>
         <h1>Game Clicker <span>⚔</span></h1>
       </div>
       <div class="topbar-actions">
@@ -29,11 +29,16 @@
           <div><span>Dano automático/s</span><strong id="dpsStat">0</strong></div>
           <div><span>Inimigos derrotados</span><strong id="killStat">0</strong></div>
           <div><span>Chefes derrotados</span><strong id="bossStat">0</strong></div>
+          <div><span>Chance crítica</span><strong id="critStat">5%</strong></div>
         </div>
         <div class="tip">
           <h2>Como jogar</h2>
-          <p>Toque no inimigo para atacar. Derrote-o para ganhar moedas e comprar armas. A cada 10ª fase surge um chefe!</p>
+          <p>Toque no inimigo para atacar, compre equipamentos e melhore suas habilidades. A cada 10ª fase surge um chefe!</p>
         </div>
+        <section class="upgrades" aria-label="Melhorias permanentes">
+          <div class="panel-title">MELHORIAS PERMANENTES</div>
+          <div id="upgradesList" class="upgrades-list"></div>
+        </section>
       </aside>
       <section class="battle-panel" aria-label="Área de combate">
         <div class="enemy-header">
@@ -54,6 +59,11 @@
           <span class="attack-prompt">TOQUE PARA ATACAR</span>
           <span id="hitNumber" class="hit-number" aria-hidden="true"></span>
         </button>
+        <div class="skill-bar" aria-label="Habilidades especiais">
+          <button id="smashSkill" type="button" class="skill-button" aria-label="Ativar Golpe poderoso"></button>
+          <button id="furySkill" type="button" class="skill-button" aria-label="Ativar Fúria"></button>
+        </div>
+        <p id="offlineMessage" class="offline-message" role="status" hidden></p>
         <p id="battleMessage" class="battle-message" role="status" aria-live="polite">Uma criatura bloqueia seu caminho. Prepare sua espada!</p>
       </section>
       <aside class="panel shop-panel" aria-label="Loja de armas">
