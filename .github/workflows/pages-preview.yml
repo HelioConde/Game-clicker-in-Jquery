@@ -1,0 +1,62 @@
+name: Publicar Game Clicker no GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'css/**'
+      - 'js/**'
+      - 'img/**'
+      - 'efeito/**'
+      - 'tests/**'
+      - '.github/workflows/pages-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-game-clicker
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node --check js/game-core.js
+          node --check js/script.js
+          node --test tests/game-core.test.cjs
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar apenas arquivos públicos
+        run: |
+          mkdir -p dist/css dist/js dist/img dist/efeito
+          cp index.html dist/index.html
+          cp css/style.css dist/css/style.css
+          cp js/game-core.js js/script.js dist/js/
+          cp img/*.png img/*.gif img/*.webp dist/img/
+          cp efeito/espada.mp3 efeito/dinheiro.mp3 efeito/erro.mp3 dist/efeito/
+          touch dist/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,55 @@
+name: QA Game Clicker
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Núcleo de jogo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar JavaScript
+        run: |
+          node --check js/game-core.js
+          node --check js/script.js
+          node --check tests/game.browser.spec.cjs
+      - name: Testar combate, habilidades e salvamentos
+        run: node --test tests/game-core.test.cjs
+
+  browser:
+    name: Chromium desktop e mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save --ignore-scripts @playwright/test@1.56.0
+          npx playwright install --with-deps chromium
+      - name: QA de navegador
+        run: npx playwright test --config playwright.config.cjs
+      - name: Salvar screenshots e traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-clicker-visual-qa
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7

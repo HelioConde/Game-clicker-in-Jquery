@@ -1,233 +1,131 @@
-* {
-    margin: 0;
-    padding: 0;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    font-size: 20px;
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
+:root{
+  color-scheme:dark;--bg:#10101a;--panel:#211d2d;--panel2:#2b2539;--border:#51405f;--text:#faf5ef;
+  --muted:#c2b8c9;--gold:#ffd17b;--green:#74d8a3;--red:#fc7f85;
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif
 }
+*{box-sizing:border-box}
+html{min-height:100%}
+body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 50% -25%,#392956,var(--bg) 65%)}
+button{font:inherit}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+button:disabled{opacity:.6;cursor:not-allowed}
+[hidden]{display:none!important}
+.app{max-width:1600px;margin:auto;padding:22px 20px 12px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;padding:8px 4px 18px;border-bottom:1px solid #4f405b}
+.eyebrow,.panel-title{font-size:11px;letter-spacing:.19em;font-weight:800;color:var(--gold)}
+h1{margin:1px 0;font-size:clamp(26px,3vw,38px);line-height:1.1;letter-spacing:-.035em}
+h1 span{color:var(--gold)}
+h2{margin:2px 0 12px;font-size:clamp(20px,2vw,26px)}
+.topbar-actions{display:flex;align-items:center;gap:14px}
+.save-status{font-size:12px;color:var(--green)}
+.save-status.error{color:var(--red)}
+.secondary-button{padding:10px 14px;border:1px solid var(--border);border-radius:10px;color:var(--text);background:var(--panel);cursor:pointer}
+.secondary-button:hover{background:#38304b}
+.game-layout{display:grid;grid-template-columns:minmax(205px,245px) minmax(300px,1fr) minmax(255px,305px);gap:16px;align-items:stretch}
+.panel,.battle-panel{min-width:0;border:1px solid var(--border);border-radius:16px;box-shadow:0 15px 30px #0003}
+.panel{background:linear-gradient(155deg,#292338,var(--panel) 60%);padding:22px}
+.progress-panel{display:flex;flex-direction:column;gap:24px}
+.wallet{display:flex;flex-direction:column;gap:4px;padding:19px 16px;border-radius:13px;border:1px solid #6f563f;background:linear-gradient(135deg,#3f342f,#2b2528)}
+.wallet-label{font-size:13px;color:var(--muted)}
+#valor{font-size:clamp(26px,2.5vw,40px);color:var(--gold);font-weight:800;line-height:1.25;overflow-wrap:anywhere}
+#valor:before{content:"🪙 ";font-size:.7em}
+.stat-block{display:grid;gap:15px}
+.stat-block>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid #ffffff14;padding-bottom:12px}
+.stat-block span{font-size:13px;color:var(--muted)}
+.stat-block strong{font-size:17px;color:var(--text);text-align:right}
+.tip{margin-top:auto;border:1px solid #635070;background:#322942;border-radius:12px;padding:16px}
+.tip h2{font-size:16px;margin:0 0 8px}
+.tip p,.shop-help{font-size:13px;line-height:1.6;color:var(--muted);margin:0}
+.battle-panel{display:flex;flex-direction:column;padding:18px;background:linear-gradient(180deg,#26233b,#121a2b);overflow:hidden}
+.enemy-header{position:relative;z-index:1;padding:8px 6px 14px}
+.stage-row{display:flex;align-items:center;gap:10px}
+.stage-label,.boss-badge{display:inline-block;padding:5px 10px;border-radius:6px;background:#3f365b;font-size:11px;font-weight:800;letter-spacing:.1em}
+.boss-badge{background:#752935;color:#ffe1c7}
+.enemy-header h2{margin:7px 0 11px;font-size:clamp(20px,2vw,30px)}
+.hp-label{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px;font-size:13px;color:var(--muted)}
+#enemyHpBar{display:block;width:100%;height:16px;appearance:none;border:1px solid #6c3650;border-radius:50px;overflow:hidden;background:#160f19}
+#enemyHpBar::-webkit-progress-bar{background:#160f19}
+#enemyHpBar::-webkit-progress-value{background:linear-gradient(90deg,#ca3e5f,#ff8780);border-radius:30px;transition:width .16s}
+#enemyHpBar::-moz-progress-bar{background:linear-gradient(90deg,#ca3e5f,#ff8780);border-radius:30px}
+.reward-label{font-size:13px;color:var(--muted);margin:11px 0 0}
+.reward-label strong{color:var(--gold)}
+.arena{position:relative;display:flex;align-items:center;justify-content:center;flex:1;width:100%;min-height:330px;padding:20px 10px 54px;overflow:hidden;border-radius:13px;cursor:crosshair;border:1px solid #5c5368;color:var(--text);
+  background:linear-gradient(180deg,#04152e80,#051120a8),url("../img/cenario.png") center/cover no-repeat}
+.arena:before{content:"";position:absolute;inset:0;background:url("../img/cenario2.png") center/cover no-repeat;opacity:.14;pointer-events:none}
+.arena:hover{border-color:#bba4d8}
+.arena:active{filter:brightness(1.13)}
+.arena-scene{position:relative;display:flex;width:100%;align-items:end;justify-content:center;gap:3%;min-height:220px}
+.scene-character,.scene-enemy{width:min(42%,205px);height:clamp(165px,24vw,270px);object-fit:contain;image-rendering:auto;pointer-events:none;filter:drop-shadow(0 9px 5px #0008)}
+.scene-enemy{transition:transform .18s;transform-origin:center bottom}
+.arena.boss .scene-enemy{transform:scale(1.2);filter:drop-shadow(0 0 20px #ec4b78a8)}
+.arena.hit .scene-enemy{filter:brightness(1.9) drop-shadow(0 0 12px #ff6262)}
+.attack-prompt{position:absolute;bottom:17px;left:0;right:0;text-align:center;color:#ffe1aa;font-size:12px;letter-spacing:.14em;font-weight:900;pointer-events:none}
+.hit-number{position:absolute;top:34%;left:57%;color:#fff1ad;text-shadow:2px 3px 3px #180d20;font-weight:900;font-size:30px;pointer-events:none;opacity:0}
+.hit-number.show{animation:float-hit .52s ease-out}
+@keyframes float-hit{0%{opacity:1;transform:translateY(10px) scale(.75)}55%{opacity:1;transform:translateY(-12px) scale(1.2)}100%{opacity:0;transform:translateY(-35px)}}
+.battle-message{margin:13px 8px 2px;font-size:13px;color:var(--muted);min-height:42px}
+.shop-panel{padding:20px 14px 20px 20px}
+.shop-head{display:flex;justify-content:space-between;align-items:center}
+.shop-head h2{margin:3px 0}
+.shop-count{font-size:12px;color:var(--muted)}
+.shop-help{margin:3px 6px 14px 0}
+.items{display:flex;flex-direction:column;gap:8px;max-height:min(700px,72vh);overflow-y:auto;scrollbar-color:#766789 #262133;padding-right:5px}
+.item{display:grid;grid-template-columns:45px minmax(0,1fr) auto;grid-template-rows:auto auto;gap:1px 10px;align-items:center;min-height:69px;width:100%;padding:10px;border:1px solid #6a5065;border-radius:10px;text-align:left;background:#382a39;color:var(--text);cursor:pointer;transition:background .16s,border-color .16s}
+.item:hover{background:#49364b;border-color:#bba4d8}
+.item.affordable{border-color:#327f65;background:#1c423a}
+.item.affordable:hover{background:#235c4d}
+.item.unaffordable{opacity:.86}
+.item img{width:44px;height:44px;object-fit:contain;grid-row:1/3}
+.item .item-name{font-weight:800;font-size:13px;white-space:normal}
+.item small{font-size:11px;color:var(--muted);grid-column:2/4}
+.item strong{font-size:13px;color:var(--gold);white-space:nowrap;grid-column:3;grid-row:1}
+.footer{padding:16px 4px 3px;font-size:12px;color:#a99db4;text-align:center}
+@media(max-width:1050px){.game-layout{grid-template-columns:minmax(190px,235px) minmax(320px,1fr)}.shop-panel{grid-column:1/-1}.items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-height:none}}
+@media(max-width:650px){
+ .app{padding:12px 10px}.topbar{align-items:flex-start}.topbar-actions{flex-direction:column;align-items:flex-end;gap:6px}
+ .secondary-button{font-size:13px;padding:7px 10px}
+ .game-layout{display:flex;flex-direction:column;gap:10px}
+ .progress-panel{order:2;gap:12px;padding:16px}
+ .battle-panel{order:1;padding:10px}
+ .shop-panel{order:3;padding:16px}
+ .stat-block{grid-template-columns:repeat(2,1fr);gap:8px}
+ .stat-block>div{display:flex;flex-direction:column;gap:0}
+ .wallet{padding:12px}
+ .tip{margin-top:0}
+ .arena{min-height:280px}
+ .arena-scene{min-height:165px}
+ .scene-character,.scene-enemy{height:190px}
+ .items{grid-template-columns:1fr 1fr;gap:7px}
+ .item{grid-template-columns:38px 1fr;gap:2px 7px;padding:8px}
+ .item img{width:38px;height:38px}
+ .item .item-name{font-size:12px}
+ .item strong{grid-column:2;grid-row:2;font-size:12px}
+ .item small{grid-column:1/3;font-size:10px}
+ .enemy-header{padding:6px 8px 12px}
+ .battle-message{min-height:38px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition:none!important}}
 
-#background {
-    background: linear-gradient(black, blueviolet, black);
-    background: linear-gradient(blueviolet, black);
-    position: fixed;
-    display: inline-block;
-    width: 100%;
+/* Etapa 3 — Progressão incremental, habilidades e estados acessíveis */
+.upgrades{border-top:1px solid var(--border);padding-top:18px;margin-top:0}
+.upgrades-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.upgrade-button{display:flex;flex-direction:column;align-items:stretch;gap:3px;border:1px solid #72516e;background:#32283a;color:var(--text);border-radius:11px;padding:11px 12px;text-align:left;cursor:pointer;transition:border-color .15s,background .15s}
+.upgrade-button:hover:not(:disabled){background:#42334a;border-color:var(--gold)}
+.upgrade-button:disabled{opacity:.52;cursor:not-allowed}
+.upgrade-heading{font-size:13px;font-weight:800;color:var(--text)}
+.upgrade-button small{font-size:12px;color:var(--muted)}
+.upgrade-button strong{font-size:12px;color:var(--gold);align-self:flex-end}
+.skill-bar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.skill-button{min-width:0;min-height:52px;border:1px solid #7b5b9a;border-radius:11px;color:var(--text);background:#423154;padding:11px 10px;font-weight:750;font-size:13px;cursor:pointer}
+.skill-button:hover:not(:disabled){background:#5c4175;border-color:#dab4fa}
+.skill-button:disabled{opacity:.66;cursor:not-allowed}
+.skill-button.active{border-color:#f8aa62;color:#ffe2b6;background:#704135}
+.offline-message{border:1px solid #467f65;color:#c0ffe0;border-radius:10px;background:#1e413b;padding:11px 13px;font-size:13px;margin:13px 0 0}
+.battle-message{overflow-wrap:anywhere}
+@media(max-width:650px){
+ .progress-panel .upgrades{margin-top:4px}
+ .upgrades-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .skill-button{font-size:12px;padding:10px 6px}
+ .upgrade-heading{font-size:12px}
 }
-
-#menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    display: inline-block;
-}
-
-#gameLeft {
-    position: fixed;
-    display: inline-block;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 23%;
-    border-width: 15px;
-    border-style: solid;
-    border-image: linear-gradient(to bottom, #2e0555, #00000000, #2e0555) 15 40%;
-    z-index: 2;
-    text-align: center;
-    background: linear-gradient(#424139, #c1b5a8, #413f38)
-}
-
-#gameCenter {
-    top: 0;
-    left: 25%;
-    right: 25%;
-    bottom: 0;
-    position: fixed;
-    display: inline-block;
-    border-width: 15px;
-    border-style: solid;
-    border-image: linear-gradient(to bottom, #2e0555, #00000000, #2e0555) 15 40%;
-    background: linear-gradient(#011c36, #011c36be, #011c36);
-    z-index: 1;
-    cursor: url(curso.gif), auto;
-}
-
-#gameCenter {
-    display: inline-block;
-}
-
-#dinheiro {
-    width: 49%;
-    position: fixed;
-    z-index: -1;
-}
-
-#dinheiro img {
-    width: 20%;
-    display: inline-block;
-    z-index: -1;
-}
-
-#personagem img, #enimei img {
-    margin-top: 50%;
-    width: 100%;
-    display: inline-block;
-    z-index: 1;
-}
-
-#personagem, #enimei {
-    width: 49%;
-    display: inline-block;
-    z-index: 1;
-}
-
-#cenario {
-    z-index: -20;
-    width: 50%;
-}
-
-#cenario img {
-    margin-top: -30%;
-    width: 48%;
-    z-index: -20;
-    position: fixed;
-}
-
-#cenario2 {
-    z-index: -20;
-    width: 50%;
-}
-
-#cenario2 img {
-    margin-top: -1%;
-    width: 48%;
-    z-index: -20;
-    position: fixed;
-    transform: rotate(180deg);
-}
-
-#gameRight {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 23%;
-    position: fixed;
-    display: inline-block;
-    border-width: 15px;
-    border-style: solid;
-    border-image: linear-gradient(to bottom, #2e0555, #00000000, #2e0555) 15 40%;
-    z-index: 3;
-    background: linear-gradient(#424139, #c1b5a8, #413f38);
-    overflow-x: hidden;
-    overflow-y: scroll;
-}
-
-.item {
-    margin: 10px;
-    text-align: center;
-    padding: 10px;
-    cursor: pointer;
-    border-width: 5px;
-    border-style: solid;
-    border-image: linear-gradient(to bottom, black, #00000000, black) 15 40%;
-}
-
-.item img {
-    width: 10%;
-    float: left;
-    position: relative;
-}
-
-#conquistas {
-    margin: 10px;
-    text-align: center;
-    border-width: 5px;
-    border-style: solid;
-    border-image: linear-gradient(to bottom, #553f03, #000000d0, #553f03) 15 40%;
-    padding: 10px;
-}
-
-#loja {
-    margin: 10px;
-    text-align: center;
-    border-width: 5px;
-    border-style: solid;
-    border-image: linear-gradient(to bottom, #553f03, #000000d0, #553f03) 15 40%;
-    padding: 10px;
-    cursor: pointer;
-}
-
-#config {
-    margin: 10px;
-    text-align: center;
-    border-width: 5px;
-    border-style: solid;
-    border-image: linear-gradient(to bottom, #553f03, #000000d0, #553f03) 15 40%;
-    padding: 10px;
-    cursor: pointer;
-}
-
-#valor {
-    margin: 10px;
-    text-align: center;
-    border-width: 5px;
-    border-style: solid;
-    border-image: linear-gradient(to bottom, #553f03, #000000d0, #553f03) 15 40%;
-    padding: 10px;
-    position: relative;
-    display: inline-block;
-}
-
-#valor ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
-#valor img {
-    width: 50%;
-}
-
-#preco {
-    float: right;
-}
-
-#menuLoja {
-    position: fixed;
-    top: 20%;
-    left: 30%;
-    right: 0;
-    bottom: 0;
-    background: #413f38d7;
-    border: 1px solid black;
-    width: 40%;
-    height: 50%;
-    overflow-x: hidden;
-    overflow-y: scroll;
-}
-
-#configLoja {
-    position: fixed;
-    top: 15%;
-    left: 30%;
-    right: 0;
-    bottom: 0;
-    background: #413f38d7;
-    border: 1px solid black;
-    width: 40%;
-    height: 20%;
-}
-
-#efeito {
-    margin-top: 10%;
-}
+@media(max-width:360px){.upgrades-list,.skill-bar{grid-template-columns:1fr}}

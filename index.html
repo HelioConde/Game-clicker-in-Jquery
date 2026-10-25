@@ -1,72 +1,100 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-
+<!doctype html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <link rel="stylesheet" href="css/style.css">
-    <!--
-    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({
-            google_ad_client: "ca-pub-2120906100952795",
-            enable_page_level_ads: true
-        });
-    </script>
-    <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
-    </script>
-    -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171424">
+  <meta name="description" content="Game Clicker: derrote monstros, compre armas e avance pelas ondas em um RPG incremental.">
+  <title>Game Clicker | Combate e evolução</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
-<body onselectstart='return false' ondragstart='return false'>
-
-    <div id="background"></div>
-    <div id="menu">
-        <div id="gameLeft">
-            <div id="valor"></div>
-            <div id="conquistas">Conquistas</div>
-            <div id="config">Configurações</div>
-            <div id="loja">Loja</div>
-            <div id="lojaOpen"></div>
-            <div id="configOpen"></div>
-            <amp-auto-ads type="adsense" data-ad-client="ca-pub-2120906100952795">
-            </amp-auto-ads>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">RPG INCREMENTAL · ETAPA 3</div>
+        <h1>Game Clicker <span>⚔</span></h1>
+      </div>
+      <div class="topbar-actions">
+        <span id="saveStatus" class="save-status" role="status">Progresso local</span>
+        <button id="config" class="secondary-button" type="button" aria-pressed="false">Som: ligado</button>
+      </div>
+    </header>
+    <main class="game-layout">
+      <aside class="panel progress-panel" aria-label="Seu progresso">
+        <div class="panel-title">AVENTUREIRO</div>
+        <div class="wallet"><span class="wallet-label">Suas moedas</span><strong id="valor">0</strong></div>
+        <div class="stat-block">
+          <div><span>Dano por clique</span><strong id="clickStat">1</strong></div>
+          <div><span>Dano automático/s</span><strong id="dpsStat">0</strong></div>
+          <div><span>Inimigos derrotados</span><strong id="killStat">0</strong></div>
+          <div><span>Chefes derrotados</span><strong id="bossStat">0</strong></div>
+          <div><span>Chance crítica</span><strong id="critStat">5%</strong></div>
         </div>
-        <div id="gameCenter">
-            <div id="dinheiro"></div>
-            <div id="personagem"><img src="img/stop.png" alt=""></div>
-            <div id="enimei"><img src="img/monstro.gif" alt=""></div>
-            <div id="cenario"><img src="img/cenario.png" alt=""></div>
-            <div id="cenario2"><img src="img/cenario2.png" alt=""></div>
+        <div class="tip">
+          <h2>Como jogar</h2>
+          <p>Toque no inimigo para atacar, compre equipamentos e melhore suas habilidades. A cada 10ª fase surge um chefe!</p>
         </div>
-        <div id="gameRight">
-            <div id="item1" class="item"></div>
-            <div id="item2" class="item"></div>
-            <div id="item3" class="item"></div>
-            <div id="item4" class="item"></div>
-            <div id="item5" class="item"></div>
-            <div id="item6" class="item"></div>
-            <div id="item7" class="item"></div>
-            <div id="item8" class="item"></div>
-            <div id="item9" class="item"></div>
-            <div id="item10" class="item"></div>
+        <section class="upgrades" aria-label="Melhorias permanentes">
+          <div class="panel-title">MELHORIAS PERMANENTES</div>
+          <div id="upgradesList" class="upgrades-list"></div>
+        </section>
+      </aside>
+      <section class="battle-panel" aria-label="Área de combate">
+        <div class="enemy-header">
+          <div class="stage-row">
+            <span id="stageLabel" class="stage-label">FASE 1</span>
+            <span id="bossBadge" class="boss-badge" hidden>CHEFE</span>
+          </div>
+          <h2 id="enemyName">Criatura Sombria</h2>
+          <div class="hp-label"><span>Vida do inimigo</span><span id="enemyHpLabel">12 / 12</span></div>
+          <progress id="enemyHpBar" max="12" value="12" aria-label="Vida do inimigo"></progress>
+          <p class="reward-label">Recompensa: <strong id="rewardValue">10</strong> moedas</p>
         </div>
-    </div>
-    <div id="efeitosSonoros">
-        <audio id="espada">
-            <source src="efeito/espada.mp3" type="audio/mp3">
-        </audio>
-        <audio id="dinheiroSom">
-            <source src="efeito/dinheiro.mp3" type="audio/mp3">
-        </audio>
-        <audio id="erro">
-            <source src="efeito/erro.mp3" type="audio/mp3">
-        </audio>
-    </div>
+        <button id="attackButton" class="arena" type="button" aria-label="Atacar inimigo">
+          <span class="arena-scene" aria-hidden="true">
+            <img class="scene-character" id="personagem" src="img/stop.png" alt="">
+            <img class="scene-enemy" id="enimei" src="img/monstro.gif" alt="">
+          </span>
+          <span class="attack-prompt">TOQUE PARA ATACAR</span>
+          <span id="hitNumber" class="hit-number" aria-hidden="true"></span>
+        </button>
+        <div class="skill-bar" aria-label="Habilidades especiais">
+          <button id="smashSkill" type="button" class="skill-button" aria-label="Ativar Golpe poderoso"></button>
+          <button id="furySkill" type="button" class="skill-button" aria-label="Ativar Fúria"></button>
+        </div>
+        <p id="offlineMessage" class="offline-message" role="status" hidden></p>
+        <p id="battleMessage" class="battle-message" role="status" aria-live="polite">Uma criatura bloqueia seu caminho. Prepare sua espada!</p>
+      </section>
+      <aside class="panel shop-panel" aria-label="Loja de armas">
+        <div class="shop-head">
+          <div>
+            <div class="panel-title">LOJA</div>
+            <h2>Arsenal</h2>
+          </div>
+          <span class="shop-count">10 armas</span>
+        </div>
+        <p class="shop-help">Melhore seus golpes e desbloqueie dano automático.</p>
+        <div class="items" id="items">
+          <button type="button" class="item" id="item1"></button>
+          <button type="button" class="item" id="item2"></button>
+          <button type="button" class="item" id="item3"></button>
+          <button type="button" class="item" id="item4"></button>
+          <button type="button" class="item" id="item5"></button>
+          <button type="button" class="item" id="item6"></button>
+          <button type="button" class="item" id="item7"></button>
+          <button type="button" class="item" id="item8"></button>
+          <button type="button" class="item" id="item9"></button>
+          <button type="button" class="item" id="item10"></button>
+        </div>
+      </aside>
+    </main>
+    <footer class="footer">Progresso salvo neste navegador · Sem login · Ataque com clique, toque, Enter ou Espaço</footer>
+  </div>
+  <audio id="espada" preload="none" src="efeito/espada.mp3"></audio>
+  <audio id="dinheiroSom" preload="none" src="efeito/dinheiro.mp3"></audio>
+  <audio id="erro" preload="none" src="efeito/erro.mp3"></audio>
+  <script src="js/game-core.js"></script>
+  <script src="js/script.js"></script>
 </body>
-<script src="js/jquery-3.3.1.min.js"></script>
-<script src="js/script.js"></script>
-
 </html>
