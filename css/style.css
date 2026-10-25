@@ -584,3 +584,167 @@ body{min-height:0}
  .battle-panel .arena.boss-warning .boss-telegraph{animation:none}
  .battle-panel .arena.hit .enemy-frame{animation:none}
 }
+
+
+/* Etapa 8.1 — escala individual por criatura, mesma viewport e linha de base. */
+.battle-panel .arena-scene{
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+  gap:clamp(14px,3.3vw,55px);
+  padding-bottom:clamp(10px,3dvh,32px);
+}
+.battle-panel .arena-scene .scene-character{
+  width:min(40%,190px);
+  height:min(100%,clamp(118px,29dvh,225px));
+  flex:0 1 auto;
+  object-position:center bottom;
+  align-self:flex-end;
+}
+.battle-panel .arena-scene .enemy-frame{
+  height:auto;
+  max-height:100%;
+  aspect-ratio:110 / 85;
+  flex:0 1 auto;
+  align-self:flex-end;
+}
+/* Pequenos: de fato menores que o herói. Grandes: chefes dominam a arena. */
+.battle-panel .arena[data-enemy="slime"] .enemy-frame{
+  width:min(30%,136px,24dvh);
+  height:auto;
+  aspect-ratio:105 / 85;
+}
+.battle-panel .arena[data-enemy="bat"] .enemy-frame{
+  width:min(29%,130px,23dvh);
+  height:auto;
+  aspect-ratio:110 / 85;
+}
+.battle-panel .arena[data-enemy="golem"] .enemy-frame{
+  width:min(39%,178px,31dvh);
+  height:auto;
+  aspect-ratio:110 / 105;
+}
+.battle-panel .arena[data-enemy="shadow"] .enemy-frame{
+  width:min(39%,184px,31dvh);
+  height:min(100%,clamp(110px,26dvh,198px));
+  aspect-ratio:auto;
+}
+.battle-panel .arena[data-enemy="guardian"] .enemy-frame,
+.battle-panel .arena[data-enemy="titan"] .enemy-frame{
+  width:min(44%,220px,36dvh);
+  height:auto;
+  aspect-ratio:130 / 115;
+}
+.battle-panel .arena.boss .enemy-frame{
+  transform:scale(1.04);
+  transform-origin:center bottom;
+}
+/* A animação e a imagem original compartilham a caixa de mesma proporção. */
+.battle-panel .enemy-frame[data-sheet="true"]::before{
+  background-size:400% 100%;
+}
+.battle-panel .arena .defeat-ghost{
+  max-height:100%;
+}
+/* Botões indisponíveis continuam legíveis: o estado vem do contraste/borda,
+   não de diminuir a opacidade de toda a tipografia. */
+.shop-panel .item.unaffordable{
+  opacity:1;
+  background:#322a3c;
+  border-color:#74617c;
+  color:#eae1f0;
+}
+.shop-panel .item.unaffordable .item-name{
+  color:#f4eaf8;
+}
+.shop-panel .item.unaffordable small{
+  color:#cfc2d7;
+}
+.shop-panel .item.unaffordable strong{
+  color:#f6cf81;
+}
+.progress-panel .upgrade-button:disabled{
+  opacity:1;
+  cursor:not-allowed;
+  background:#30283c;
+  border-color:#756180;
+}
+.progress-panel .upgrade-button:disabled .upgrade-heading{
+  color:#f4eafa;
+}
+.progress-panel .upgrade-button:disabled small{
+  color:#d0c3da;
+}
+.progress-panel .upgrade-button:disabled strong{
+  color:#f7d48f;
+}
+/* Tempo de recarga com rótulo explícito e barra de progresso discreta.
+   Mantemos a mesma altura dos controles na tela única. */
+.battle-panel .skill-button{
+  position:relative;
+  min-width:0;
+  overflow:hidden;
+  line-height:1.2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:2px 7px;
+}
+.battle-panel .skill-button .skill-name{
+  font-weight:800;
+  white-space:normal;
+}
+.battle-panel .skill-button .skill-status{
+  font-size:11px;
+  font-weight:700;
+  color:#ffe6b1;
+  white-space:nowrap;
+}
+.battle-panel .skill-button.cooldown{
+  opacity:1;
+  background:#302640;
+  border-color:#77638a;
+  color:#eaddf4;
+  padding-bottom:9px;
+}
+.battle-panel .skill-button.cooldown .skill-status{
+  color:#e7d0fa;
+}
+.battle-panel .skill-button.cooldown::after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:var(--cooldown-progress,0%);
+  height:3px;
+  background:#b58df3;
+  transition:width .2s linear;
+}
+.battle-panel .skill-button.active .skill-status{
+  color:#ffdc99;
+}
+@media(max-width:899px){
+  .battle-panel .arena-scene{
+    gap:clamp(9px,2vw,25px);
+    padding-bottom:clamp(9px,2dvh,18px);
+  }
+  .battle-panel .arena-scene .scene-character{
+    width:min(40%,175px);
+    height:min(100%,clamp(105px,25dvh,200px));
+  }
+  .battle-panel .skill-button{
+    gap:1px 4px;
+    padding-left:4px;
+    padding-right:4px;
+  }
+  .battle-panel .skill-button .skill-name{font-size:11px}
+  .battle-panel .skill-button .skill-status{font-size:10px}
+}
+@media(max-height:540px){
+  .battle-panel .skill-button .skill-name{font-size:11px}
+  .battle-panel .skill-button .skill-status{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .battle-panel .skill-button.cooldown::after{transition:none}
+}
