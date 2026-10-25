@@ -63,9 +63,17 @@ node --test tests/game-core.test.cjs
 
 O save novo fica na chave `gameClickerV3`. A aplicação também mantém a chave V2 e as chaves legadas atualizadas para facilitar rollback. A migração reutiliza moedas, quantidade de armas e preferência de som; novos personagens começam na fase 1. A Etapa 3 reutiliza a chave V3 e preenche upgrades e habilidades ausentes com valores seguros. O cálculo offline depende do relógio local e não pretende ser um sistema antitrapaça. Não limpe os dados do site se quiser preservar sua partida.
 
+## Interface em tela única
+
+O jogo usa toda a área útil da janela (100dvh), **sem rolagem da página**. No desktop, o combate, HP e habilidades permanecem sempre acessíveis. O arsenal e a lista de melhorias podem rolar independentemente. No celular, as abas Combate, Herói e Loja compartilham a mesma viewport.
+
+A área `Como jogar` começa recolhida e pode ser aberta por toque ou teclado. Ícones de moedas são desenhados em CSS, sem depender de fontes emoji instaladas no sistema. Os sprites se adaptam à arena sem alterar o tamanho do documento.
+
+**Regra de projeto:** melhorias futuras não devem exigir rolagem geral para acessar arena ou habilidades. Os testes Playwright cobrem 7 resoluções e verificam ajuda, moedas, sprites e rolagem interna.
+
 ## Histórico e autoria
 
-O **Game Clicker original**, criado em fevereiro de 2022, era um exercício de desenvolvimento de jogos web com **HTML, CSS, JavaScript ES5 e jQuery 3.3.1**, inspirado em Cookie Clicker. Ele já possuía dez armas, personagens e monstros animados, sons e persistência por `localStorage`. O código histórico permanece na branch `main` até a aprovação deste Pull Request, e sua origem também está preservada no histórico Git.
+O **Game Clicker original**, criado em fevereiro de 2022, era um exercício de desenvolvimento de jogos web com **HTML, CSS, JavaScript ES5 e jQuery 3.3.1**, inspirado em Cookie Clicker. Ele já possuía dez armas, personagens e monstros animados, sons e persistência por `localStorage`. O código histórico permanece preservado nos commits originais do Git, anteriores à modernização.
 
 Esta evolução substitui a lógica jQuery por JavaScript modular, mas mantém os sprites e o conceito central. Não é uma versão comercial validada. Limpar os dados do site ou mudar a origem do navegador pode apagar a partida.
 

@@ -72,7 +72,7 @@
         '<span class="item-name">' + weapon[0] + '</span>' +
         '<small>Nível ' + number(state.owned[i]) + ' · ' +
         (weapon[3] ? '+' + weapon[3] + ' dano/s' : '+' + weapon[2] + ' por clique') +
-        '</small><strong>🪙 ' + number(price) + '</strong>';
+        '</small><strong class="price"><span class="coin-icon" aria-hidden="true"></span>' + number(price) + '</strong>';
     });
   }
   function renderUpgrades() {
@@ -92,7 +92,7 @@
       const desc = document.createElement("small");
       desc.textContent = item.description;
       const amount = document.createElement("strong");
-      amount.textContent = cost === null ? "MÁXIMO" : "🪙 " + number(cost);
+      amount.innerHTML = cost === null ? "MÁXIMO" : '<span class="coin-icon" aria-hidden="true"></span>' + number(cost);
       button.append(title, desc, amount);
       button.addEventListener("click", () => {
         if (!core.buyUpgrade(state, key)) { sound("erro"); return; }

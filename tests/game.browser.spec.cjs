@@ -138,3 +138,79 @@ test("listas internas continuam acessíveis sem rolar a página",async ({page})=
   expect(outside.doc).toBeLessThanOrEqual(outside.viewport+2);
   await expect(page.locator("#attackButton")).toBeVisible();
 });
+
+test("ajuda recolhida libera melhorias e pode ser expandida pelo teclado",async ({page})=>{
+  await page.setViewportSize({width:1366,height:647});
+  await page.goto("/");
+  const help=page.locator("#helpPanel");
+  await expect(help).not.toHaveAttribute("open");
+  const panel=page.locator(".progress-panel");
+  const container=page.locator("#upgradesList");
+  await expect(page.locator(".upgrade-button")).toHaveCount(4);
+  const sizes=await page.evaluate(()=>({
+    panel:document.querySelector(".progress-panel").getBoundingClientRect().height,
+    upgrades:document.querySelector("#upgradesList").clientHeight,
+    content:document.querySelector("#upgradesList").scrollHeight
+  }));
+  expect(sizes.upgrades).toBeGreaterThan(50);
+  expect(sizes.content).toBeGreaterThan(sizes.upgrades);
+  await help.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(help).toHaveAttribute("open","");
+  await expect(help.locator("p")).toBeVisible();
+  await help.locator("summary").click();
+  await expect(help).not.toHaveAttribute("open");
+  await container.locator(".upgrade-button").last().scrollIntoViewIfNeeded();
+  const metrics=await page.evaluate(()=>({
+    bodyScroll:document.documentElement.scrollHeight,
+    height:window.innerHeight,
+    panelScroll:document.querySelector(".progress-panel").scrollTop,
+    innerScroll:document.querySelector("#upgradesList").scrollTop
+  }));
+  expect(metrics.bodyScroll).toBeLessThanOrEqual(metrics.height+2);
+  expect(metrics.innerScroll).toBeGreaterThan(0);
+  expect(metrics.panelScroll).toBe(0);
+  await expect(panel).toBeVisible();
+});
+
+test("moedas visuais independem de fonte emoji e mantêm valores",async ({page})=>{
+  await page.goto("/");
+  await expect(page.locator(".coin-icon")).toHaveCount(14);
+  if (await page.locator(".mobile-nav").isVisible())
+    await page.locator('.view-tab[data-view="shop"]').click();
+  await expect(page.locator("#valor")).toHaveText("0");
+  const visual=await page.evaluate(()=>{
+    const item=document.querySelector(".item .coin-icon");
+    const wallet=window.getComputedStyle(document.querySelector("#valor"),"::before");
+    const style=window.getComputedStyle(item);
+    return {
+      coinWidth:item.getBoundingClientRect().width,
+      coinBorderRadius:style.borderRadius,
+      background:style.backgroundImage,
+      walletContent:wallet.content,
+      walletBackground:wallet.backgroundImage
+    };
+  });
+  expect(visual.coinWidth).toBeGreaterThan(8);
+  expect(visual.coinBorderRadius).toBe("50%");
+  expect(visual.background).toContain("radial-gradient");
+  expect(visual.walletBackground).toContain("radial-gradient");
+  expect(visual.walletContent).not.toContain("🪙");
+});
+
+test("arena preserva sprites visíveis sem aumentar o documento",async ({page},info)=>{
+  const {width,height}=info.project.name==="desktop-chromium"
+    ? {width:1366,height:647}:{width:390,height:844};
+  await page.setViewportSize({width,height});
+  await page.goto("/");
+  const m=await page.evaluate(()=>{
+    const box=id=>{const e=document.getElementById(id),r=e.getBoundingClientRect();return {top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
+    return {arena:box("attackButton"),hero:box("personagem"),enemy:box("enimei"),doc:document.documentElement.scrollHeight,screen:innerHeight};
+  });
+  expect(m.hero.height).toBeGreaterThan(110);
+  expect(m.enemy.height).toBeGreaterThan(110);
+  expect(m.hero.bottom).toBeLessThanOrEqual(m.arena.bottom+1);
+  expect(m.enemy.bottom).toBeLessThanOrEqual(m.arena.bottom+1);
+  expect(m.hero.top).toBeGreaterThanOrEqual(m.arena.top-2);
+  expect(m.doc).toBeLessThanOrEqual(m.screen+2);
+});
