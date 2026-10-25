@@ -12,7 +12,7 @@
   <div class="app" data-view="battle">
     <header class="topbar">
       <div>
-        <div class="eyebrow">RPG INCREMENTAL · ETAPA 3</div>
+        <div class="eyebrow">RPG INCREMENTAL</div>
         <h1>Game Clicker <span>⚔</span></h1>
       </div>
       <div class="topbar-actions">
@@ -36,10 +36,10 @@
           <div><span>Chefes derrotados</span><strong id="bossStat">0</strong></div>
           <div><span>Chance crítica</span><strong id="critStat">5%</strong></div>
         </div>
-        <div class="tip">
-          <h2>Como jogar</h2>
+        <details class="tip" id="helpPanel">
+          <summary>Como jogar <span class="tip-caret" aria-hidden="true"></span></summary>
           <p>Toque no inimigo para atacar, compre equipamentos e melhore suas habilidades. A cada 10ª fase surge um chefe!</p>
-        </div>
+        </details>
         <section class="upgrades" aria-label="Melhorias permanentes">
           <div class="panel-title">MELHORIAS PERMANENTES</div>
           <div id="upgradesList" class="upgrades-list"></div>
