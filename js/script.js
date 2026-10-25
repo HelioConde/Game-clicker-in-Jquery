@@ -169,9 +169,39 @@
     if (critical) arena.classList.add("critical");
     burst.classList.add("show");
   }
+  function animateDefeat(result) {
+    if (!result.kills || !result.defeated) return;
+    const fallen = result.defeatedBoss || result.defeated;
+    const arena = $("attackButton");
+    const monster = $("enimei");
+    const ghost = $("defeatGhost");
+    const sprite = $("defeatSprite");
+    const arenaRect = arena.getBoundingClientRect();
+    const enemyRect = monster.getBoundingClientRect();
+    // Snapshot da criatura derrotada: o novo inimigo pode aparecer
+    // imediatamente, enquanto a imagem antiga dissolve sem bloquear cliques.
+    ghost.style.left = (enemyRect.left - arenaRect.left) + "px";
+    ghost.style.top = (enemyRect.top - arenaRect.top) + "px";
+    ghost.style.width = enemyRect.width + "px";
+    ghost.style.height = enemyRect.height + "px";
+    sprite.src = fallen.sprite;
+    ghost.classList.remove("show","boss");
+    void ghost.offsetWidth;
+    if (fallen.boss) ghost.classList.add("boss");
+    ghost.classList.add("show");
+    if (result.bosses) {
+      sound("levelUpSom");
+      const banner = $("victoryBanner");
+      banner.textContent = fallen.name + " derrotado!";
+      banner.classList.remove("show");
+      void banner.offsetWidth;
+      banner.classList.add("show");
+    }
+  }
   function onResults(result) {
     if (!result.kills) return;
-    sound("dinheiroSom");
+    animateDefeat(result);
+    if (!result.bosses) sound("dinheiroSom");
     message(result.bosses > 0
       ? "Chefe derrotado! +" + number(result.gold) + " moedas · Fase " + number(state.stage) + " liberada!"
       : result.kills === 1

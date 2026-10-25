@@ -259,3 +259,62 @@ test("chefes das regiões alternam aparência mantendo ciclo de dez fases", () =
   assert.equal(a.reward,game.enemyFor(10).reward);
   assert.ok(b.hp>game.enemyFor(19).hp);
 });
+
+
+test("Etapa 7 mantém vida e recompensas originais até fase 30", () => {
+  for(const stage of [1,10,20,21,29,30]) {
+    const enemy=game.enemyFor(stage);
+    const boss=stage%10===0;
+    assert.equal(enemy.hp,Math.min(1e15,Math.ceil(12*Math.pow(1.22,stage-1)*(boss?3.5:1))));
+    assert.equal(enemy.reward,Math.min(1e15,Math.ceil(10*Math.pow(1.2,stage-1)*(boss?6:1))));
+  }
+});
+
+test("Etapa 7 reduz crescimento de HP a partir da fase 31", () => {
+  const wave30=game.enemyFor(30);
+  const wave31=game.enemyFor(31);
+  const old31=Math.ceil(12*Math.pow(1.22,30));
+  assert.ok(wave31.hp<old31,"fase 31 deve crescer mais lentamente");
+  assert.ok(game.enemyFor(40).hp < Math.ceil(12*Math.pow(1.22,39)*3.5));
+  assert.ok(game.enemyFor(50).hp>game.enemyFor(40).hp);
+  assert.ok(wave30.hp>game.enemyFor(29).hp);
+  assert.equal(wave31.reward,Math.ceil(10*Math.pow(1.2,30)));
+});
+
+test("save legado após fase 30 preserva percentual de HP sem migrar duas vezes", () => {
+  const stage=40;
+  const oldMax=Math.ceil(12*Math.pow(1.22,39)*3.5);
+  const old={version:3,money:400,owned:Array(10).fill(0),stage,hp:Math.floor(oldMax/4),kills:39,bosses:3};
+  const migrated=game.normalize(old);
+  const nowMax=game.enemyFor(stage).hp;
+  assert.equal(migrated.balanceVersion,2);
+  assert.ok(Math.abs(migrated.hp/nowMax-.25)<.01);
+  assert.equal(migrated.money,400);
+  assert.equal(migrated.kills,39);
+  assert.equal(migrated.bosses,3);
+  assert.equal(game.normalize(migrated).hp,migrated.hp);
+  assert.equal(game.normalize(migrated).stage,stage);
+});
+
+test("derrotas informam sprite anterior, inclusive chefes, sem alterar moedas", () => {
+  const state=game.normalize({version:3,money:0,owned:Array(10).fill(0),stage:10,hp:1,kills:9,bosses:0});
+  const result=game.damage(state,1);
+  assert.equal(result.kills,1);
+  assert.equal(result.bosses,1);
+  assert.equal(result.defeated.id,"guardian");
+  assert.equal(result.defeatedBoss.sprite,"img/inimigos/guardiao-bosque.svg");
+  assert.equal(state.stage,11);
+  assert.equal(state.money,game.enemyFor(10).reward);
+  const none=game.damage(state,0);
+  assert.equal(none.kills,0);
+  assert.equal(none.defeated,null);
+});
+
+test("dano massivo mantém informação do último chefe derrotado",()=>{
+  const s=game.normalize({version:3,money:0,owned:Array(10).fill(0),stage:9,hp:1});
+  const result=game.damage(s,1e10);
+  assert.ok(result.bosses>=1);
+  assert.equal(result.defeatedBoss.boss,true);
+  assert.equal(result.defeatedBoss.stage%10,0);
+  assert.ok(result.defeated.stage>=result.defeatedBoss.stage);
+});

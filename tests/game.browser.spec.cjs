@@ -262,3 +262,66 @@ test("chefe usa sprite exclusivo e não remove habilidades da tela",async ({page
   await expect(page.locator("#smashSkill")).toBeVisible();
   await expect(page.locator("#furySkill")).toBeVisible();
 });
+
+
+test("Etapa 7 aplica idle específico por inimigo sem rolar a tela",async ({page},info)=>{
+  const stage=info.project.name==="desktop-chromium"?4:7;
+  await openWithSave(page,{stage});
+  const infoIdle=await page.evaluate(()=>{
+    const arena=document.getElementById("attackButton");
+    const img=document.getElementById("enimei");
+    const style=getComputedStyle(img);
+    return {name:style.animationName,viewport:innerHeight,height:document.documentElement.scrollHeight,enemy:arena.dataset.enemy};
+  });
+  expect(infoIdle.name).toBe(stage===4?"idle-slime":"idle-bat");
+  expect(infoIdle.height).toBeLessThanOrEqual(infoIdle.viewport+2);
+});
+
+test("derrota de chefe exibe celebração e preserva o novo inimigo",async ({page})=>{
+  const owned=Array(10).fill(0);owned[0]=300;
+  await openWithSave(page,{stage:10,owned});
+  await expect(page.locator("#enimei")).toHaveAttribute("src",/guardiao-bosque\.svg$/);
+  await page.locator("#attackButton").click();
+  await expect(page.locator("#victoryBanner")).toContainText("Guardião do Bosque");
+  await expect(page.locator("#victoryBanner")).toHaveClass(/show/);
+  await expect(page.locator("#defeatGhost")).toHaveClass(/boss/);
+  await expect(page.locator("#defeatSprite")).toHaveAttribute("src",/guardiao-bosque\.svg$/);
+  await expect(page.locator("#stageLabel")).not.toHaveText("FASE 10");
+  await expect(page.locator("#enimei")).not.toHaveAttribute("src",/guardiao-bosque\.svg$/);
+  await page.reload();
+  await expect(page.locator("#bossStat")).toHaveText("1");
+});
+
+test("sem animação excessiva quando usuário prefere movimento reduzido",async ({page})=>{
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await openWithSave(page,{stage:4});
+  const anim=await page.locator("#enimei").evaluate(el=>getComputedStyle(el).animationName);
+  expect(anim).toBe("none");
+  const owned=Array(10).fill(0);
+  await expect(page.locator("#attackButton")).toBeVisible();
+  const dim=await page.evaluate(()=>({doc:document.documentElement.scrollHeight,h:innerHeight}));
+  expect(dim.doc).toBeLessThanOrEqual(dim.h+2);
+});
+
+test("HP após fase 30 permanece estável em recargas do save migrado",async ({page})=>{
+  await page.addInitScript(()=>{
+    if(sessionStorage.getItem("__phase40"))return;
+    const old=Math.ceil(12*Math.pow(1.22,39)*3.5);
+    localStorage.clear();
+    localStorage.setItem("gameClickerV3",JSON.stringify({
+      version:3,money:400,owned:Array(10).fill(0),sound:false,
+      stage:40,hp:Math.floor(old/4),kills:39,bosses:3,lastSeen:Date.now()
+    }));
+    sessionStorage.setItem("__phase40","1");
+  });
+  await page.goto("/");
+  const first=await page.evaluate(()=>{
+    const s=JSON.parse(localStorage.getItem("gameClickerV3"));
+    return {hp:s.hp,max:Number(document.getElementById("enemyHpBar").max),balance:s.balanceVersion}
+  });
+  expect(first.balance).toBe(2);
+  expect(Math.abs(first.hp/first.max-.25)).toBeLessThan(.01);
+  await page.reload();
+  const second=await page.evaluate(()=>JSON.parse(localStorage.getItem("gameClickerV3")).hp);
+  expect(second).toBe(first.hp);
+});

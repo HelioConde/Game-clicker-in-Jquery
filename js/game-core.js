@@ -49,6 +49,12 @@
     ["golem","slime","shadow"],
     ["bat","shadow","golem"]
   ]);
+  // Mantém todas as fases até 30 com o balanceamento original.
+  // Da fase 31 em diante, a curva de HP desacelera de 22% para 16% por fase.
+  const hpCurve = wave => Math.pow(1.22,Math.min(wave-1,29)) *
+    Math.pow(1.16,Math.max(0,wave-30));
+  const legacyHp = wave => Math.min(MAX,Math.ceil(12*Math.pow(1.22,wave-1) *
+    (wave%10===0?3.5:1)));
   const enemyFor = stage => {
     const wave=stageNumber(stage), boss=wave%10===0;
     const regionIndex=Math.floor((wave-1)/10)%REGIONS.length;
@@ -59,7 +65,7 @@
     return {
       stage:wave,boss,id,name:meta.name,sprite:meta.sprite,
       biome:REGIONS[regionIndex],
-      hp:Math.min(MAX,Math.ceil(12*Math.pow(1.22,wave-1)*(boss?3.5:1))),
+      hp:Math.min(MAX,Math.ceil(12*hpCurve(wave)*(boss?3.5:1))),
       reward:Math.min(MAX,Math.ceil(10*Math.pow(1.2,wave-1)*(boss?6:1)))
     };
   };
@@ -72,13 +78,19 @@
     )));
     const stage=advanced?stageNumber(saved.stage):1;
     const maxHp=enemyFor(stage).hp;
-    const health=advanced && saved.hp!=null?Math.min(maxHp,finite(saved.hp)):maxHp;
+    // Em saves anteriores à Etapa 7, mantemos a porcentagem da vida
+    // do inimigo para quem já estava jogando após a fase 30.
+    const migratedHealth=advanced && stage>30 && saved.balanceVersion!==2 && saved.hp!=null
+      ? Math.ceil(Math.min(1,finite(saved.hp)/legacyHp(stage))*maxHp)
+      : advanced && saved.hp!=null ? Math.min(maxHp,finite(saved.hp)) : maxHp;
+    const health=migratedHealth;
     const upgrades={};
     for(const key of Object.keys(UPGRADES)) {
       upgrades[key]=advanced?Math.min(UPGRADES[key].max,Math.floor(finite(saved.upgrades && saved.upgrades[key]))):0;
     }
     return {
       version:3,
+      balanceVersion:2,
       money:finite(compatible?saved.money:legacy.dinheiro),
       owned,
       sound:compatible?saved.sound!==false:legacy.efetioSom!=="off",
@@ -129,6 +141,7 @@
   }
   function damage(s,amount) {
     let remaining=finite(amount),kills=0,gold=0,bosses=0;
+    let defeated=null,defeatedBoss=null;
     while(remaining>0&&kills<50) {
       const enemy=enemyFor(s.stage);
       const hit=Math.min(remaining,s.hp);
@@ -136,7 +149,11 @@
       remaining-=hit;
       if(s.hp>0)break;
       kills++;
-      if(enemy.boss)bosses++;
+      defeated={id:enemy.id,name:enemy.name,sprite:enemy.sprite,boss:enemy.boss,stage:enemy.stage};
+      if(enemy.boss) {
+        bosses++;
+        defeatedBoss=defeated;
+      }
       const bonus=1+.15*(s.upgrades?.treasure||0);
       const prize=Math.min(MAX,Math.ceil(enemy.reward*bonus));
       gold=Math.min(MAX,gold+prize);
@@ -146,7 +163,7 @@
       s.stage=Math.min(9999,s.stage+1);
       s.hp=enemyFor(s.stage).hp;
     }
-    return {kills,gold,bosses};
+    return {kills,gold,bosses,defeated,defeatedBoss};
   }
   const furyActive=(s,now)=>timestamp(now)<s.furyUntil;
   function strike(s,now,random=Math.random) {
