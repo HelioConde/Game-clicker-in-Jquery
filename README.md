@@ -46,6 +46,15 @@ O projeto começou como um **clicker em jQuery em 2022** e foi modernizado mante
 - Bônus offline: 20% do DPS por segundo, a partir de 60s ausente e limite de 8 horas; não avança fases offline.
 - Sem conta, banco de dados ou servidor necessários.
 
+## Etapa 7 — Animações e balanceamento
+
+- Movimentos próprios de idle via CSS: slime saltita, morcego flutua, golem respira e chefes pairam. As artes SVG originais continuam intactas e o GIF histórico mantém sua animação.
+- Ao derrotar um inimigo, uma cópia **somente visual** da criatura derrotada se dissolve sem interromper a partida. Chefes têm animação de derrota diferenciada, banner de vitória e som `efeito/levelup.mp3` (respeita a preferência de áudio).
+- A partir da fase **31**, a taxa de crescimento de HP passa de 22% para 16% por fase. As fases 1–30 e todas as recompensas mantêm os valores anteriores.
+- Saves V3 antigos acima da fase 30 preservam a proporção de vida restante na primeira atualização; o campo interno `balanceVersion` impede que a conversão se repita em recargas. Moedas, armas, fases e chefes continuam salvos normalmente.
+- Os efeitos são sobrepostos à arena, não aumentam sua altura, e são desativados quando a preferência `prefers-reduced-motion` está ativa. A interface continua em uma tela.
+- Testes de regressão verificam as curvas de HP, migração, derrota de chefe e experiência em desktop/mobile.
+
 ## Etapa 6 — Diversidade de inimigos e cenários
 
 - Inimigos alternados por fase: **Criatura Sombria** (sprite legado), **Slime do Bosque**, **Morcego do Crepúsculo** e **Golem de Pedra**.
