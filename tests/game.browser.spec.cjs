@@ -176,6 +176,8 @@ test("ajuda recolhida libera melhorias e pode ser expandida pelo teclado",async 
 test("moedas visuais independem de fonte emoji e mantêm valores",async ({page})=>{
   await page.goto("/");
   await expect(page.locator(".coin-icon")).toHaveCount(14);
+  if (await page.locator(".mobile-nav").isVisible())
+    await page.locator('.view-tab[data-view="shop"]').click();
   await expect(page.locator("#valor")).toHaveText("0");
   const visual=await page.evaluate(()=>{
     const item=document.querySelector(".coin-icon");
