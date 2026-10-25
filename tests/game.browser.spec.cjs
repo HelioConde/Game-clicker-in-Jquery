@@ -365,12 +365,12 @@ test("Etapa 8 permite esquivar do chefe e pune golpe não defendido",async ({pag
   await expect(page.locator("#bossGuard")).toBeVisible();
   await page.clock.runFor(2800);
   await expect(page.locator("#attackButton")).toHaveClass(/boss-stunned/);
-  const hp=await page.locator("#enemyHpBar").inputValue();
+  const hp=await page.locator("#enemyHpBar").evaluate(el=>el.value);
   await page.locator("#attackButton").click();
-  expect(await page.locator("#enemyHpBar").inputValue()).toBe(hp);
+  expect(await page.locator("#enemyHpBar").evaluate(el=>el.value)).toBe(hp);
   await page.clock.runFor(1400);
   await page.locator("#attackButton").click();
-  expect(Number(await page.locator("#enemyHpBar").inputValue())).toBeLessThan(Number(hp));
+  expect(Number(await page.locator("#enemyHpBar").evaluate(el=>el.value))).toBeLessThan(Number(hp));
 });
 
 test("Etapa 8 mantém as três habilidades dentro da viewport durante ataque do chefe",async ({page},info)=>{
