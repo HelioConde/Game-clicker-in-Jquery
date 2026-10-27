@@ -588,3 +588,56 @@ test("Etapa 9 mantém missão e baú dentro da única tela em desktop e celular"
   expect(geometry.totalHeight).toBeLessThanOrEqual(geometry.h+2);
   expect(geometry.totalWidth).toBeLessThanOrEqual(geometry.w+2);
 });
+
+test("backup exporta um save válido e permite restaurar em outra sessão",async ({page})=>{
+  await openWithSave(page,{money:875,stage:7});
+  await page.locator("#backupMenu summary").click();
+  const downloadPromise=page.waitForEvent("download");
+  await page.locator("#backupExport").click();
+  const download=await downloadPromise;
+  expect(download.suggestedFilename()).toBe("game-clicker-backup.json");
+  const fs=require("node:fs");
+  const contents=JSON.parse(fs.readFileSync(await download.path(),"utf8"));
+  expect(contents.application).toBe("game-clicker");
+  expect(contents.formatVersion).toBe(1);
+  expect(contents.save.money).toBe(875);
+  expect(contents.save.stage).toBe(7);
+  // Simula a transferência para outra partida, preservando o backup exportado.
+  const transfer=JSON.parse(JSON.stringify(contents));
+  transfer.save.stage=3;
+  transfer.save.hp=1;
+  transfer.save.money=123;
+  page.once("dialog", dialog=>dialog.accept());
+  await page.locator("#backupImport").setInputFiles({
+    name:"game-clicker-backup.json",
+    mimeType:"application/json",
+    buffer:Buffer.from(JSON.stringify(transfer))
+  });
+  await expect(page.locator("#stageLabel")).toHaveText("FASE 3");
+  await expect(page.locator("#valor")).toHaveText("123");
+  await page.reload();
+  await expect(page.locator("#stageLabel")).toHaveText("FASE 3");
+});
+test("backup rejeita arquivo inválido preservando o save local",async ({page})=>{
+  await openWithSave(page,{money:100,stage:4});
+  await page.locator("#backupMenu summary").click();
+  await page.locator("#backupImport").setInputFiles({
+    name:"corrompido.json",
+    mimeType:"application/json",
+    buffer:Buffer.from(JSON.stringify({application:"game-clicker",formatVersion:1,save:{version:3,owned:[1]}}))
+  });
+  await expect(page.locator("#backupStatus")).toContainText("Importação rejeitada");
+  await expect(page.locator("#stageLabel")).toHaveText("FASE 4");
+  await page.reload();
+  await expect(page.locator("#stageLabel")).toHaveText("FASE 4");
+});
+test("menu de backup preserva área do jogo e navegação por teclado",async ({page},info)=>{
+  await page.goto("/");
+  await page.locator("#backupMenu summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#backupExport")).toBeVisible();
+  const sizes=await page.evaluate(()=>({height:document.documentElement.scrollHeight,width:document.documentElement.scrollWidth,h:innerHeight,w:innerWidth}));
+  expect(sizes.height).toBeLessThanOrEqual(sizes.h+2);
+  expect(sizes.width).toBeLessThanOrEqual(sizes.w+2);
+  await page.screenshot({path:"test-results/"+info.project.name+"-backup.png",fullPage:true,animations:"disabled"});
+});

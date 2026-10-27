@@ -6,7 +6,12 @@
   const readJSON = key => { try { return JSON.parse(read(key) || "null"); } catch (_) { return null; } };
   const legacy = { dinheiro:read("dinheiro"), efetioSom:read("efetioSom") };
   for (let i = 1; i <= 10; i++) legacy["arma" + i] = read("arma" + i);
-  const state = core.normalize(readJSON("gameClickerV3") || readJSON("gameClickerV2"), legacy);
+  // Um backup importado tem prioridade apenas na inicialização seguinte.
+  // Evita que o evento pagehide sobrescreva o save restaurado durante o reload.
+  const pending = readJSON("gameClickerV3PendingImport");
+  const validPending = pending && pending.version === 3 && Array.isArray(pending.owned);
+  const state = core.normalize((validPending ? pending : null) || readJSON("gameClickerV3") || readJSON("gameClickerV2"), legacy);
+  if (pending) { try { localStorage.removeItem("gameClickerV3PendingImport"); } catch (_) {} }
   const offline = core.claimOffline(state, Date.now());
   const number = n => Math.floor(n).toLocaleString("pt-BR");
   const precise = n => n.toLocaleString("pt-BR",{maximumFractionDigits:1});
@@ -472,6 +477,7 @@
     }
     if (now - lastSave >= 2000) { save(); lastSave = now; }
   }, 250);
+  document.addEventListener("gameclicker:save", save);
   window.addEventListener("pagehide", save);
   renderSound();
   renderAll();

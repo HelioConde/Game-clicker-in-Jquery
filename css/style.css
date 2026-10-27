@@ -1,13 +1,14 @@
 :root{
   color-scheme:dark;--bg:#10101a;--panel:#211d2d;--panel2:#2b2539;--border:#51405f;--text:#faf5ef;
-  --muted:#c2b8c9;--gold:#ffd17b;--green:#74d8a3;--red:#fc7f85;
+  --muted:#c2b8c9;--gold:#ffd17b;--green:#74d8a3;--red:#fc7f85;--focus-ring:#ffe39c;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--radius-control:10px;
   font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif
 }
 *{box-sizing:border-box}
 html{min-height:100%}
 body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(ellipse at 50% -25%,#392956,var(--bg) 65%)}
 button{font:inherit}
-button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
 button:disabled{opacity:.6;cursor:not-allowed}
 [hidden]{display:none!important}
 .app{max-width:1600px;margin:auto;padding:22px 20px 12px}
@@ -830,3 +831,29 @@ body{min-height:0}
   .battle-panel .chest-content p{margin-bottom:4px}
   .battle-panel .chest-options button{min-height:55px}
 }
+
+/* Etapa 10 — backup local e design system: painel sobreposto preserva a regra de uma tela. */
+.save-menu{position:relative;flex:none;z-index:30}
+.save-menu summary{display:flex;align-items:center;justify-content:center;min-height:38px;cursor:pointer;list-style:none;user-select:none;white-space:nowrap}
+.save-menu summary::-webkit-details-marker{display:none}
+.save-menu[open] summary{border-color:var(--gold);background:#3c324b}
+.backup-popover{
+  position:absolute;right:0;top:calc(100% + var(--space-2));z-index:30;
+  width:min(310px,calc(100vw - 24px));padding:var(--space-4);
+  display:grid;gap:var(--space-2);border:1px solid #927c9c;border-radius:var(--radius-control);
+  color:var(--text);background:#292138;box-shadow:0 18px 34px #05020dcc;
+}
+.backup-popover strong{font-size:14px;color:var(--gold)}
+.backup-popover p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
+.backup-action{
+  width:100%;display:flex;align-items:center;justify-content:center;
+  min-height:39px;padding:var(--space-2) var(--space-3);font-size:13px;
+  border:1px solid #9c829e;border-radius:var(--radius-control);background:#3d304d;
+  color:var(--text);font-weight:750;cursor:pointer;text-align:center
+}
+.backup-action:hover{background:#544060;border-color:var(--gold)}
+.backup-action:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important}
+#backupStatus[data-error="true"]{color:#ffd1d4}
+@media(max-width:650px){.save-menu summary{font-size:12px!important;padding:6px 9px!important;min-height:32px}}
+@media(prefers-reduced-motion:reduce){.backup-action,.save-menu summary{transition:none!important}}

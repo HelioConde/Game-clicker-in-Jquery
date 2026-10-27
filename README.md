@@ -108,3 +108,15 @@ O sistema idle utiliza o relógio local e não é um mecanismo antitrapaça. A e
 ---
 
 <div align="center"><strong>Desenvolvido por <a href="https://github.com/HelioConde">Hélio Conde</a></strong></div>
+
+## Etapa 10 — backup do progresso, design system e QA
+
+A interface possui um menu **Backup** na barra superior. **Exportar save (.json)** gera uma cópia local do progresso; **Importar save (.json)** valida o arquivo, pede confirmação antes de substituir a partida atual e aplica o save no próximo carregamento. Aceita arquivos de até 100 KB com identificador e versão do Game Clicker.
+
+- O sistema não envia o save para um servidor: o usuário controla o arquivo exportado.
+- Dados salvos podem ser alterados por qualquer pessoa com acesso ao arquivo. Não são provas confiáveis para um ranking competitivo.
+- A restauração não depende de banco de dados e funciona também no GitHub Pages.
+- Capturas e testes Playwright foram estendidos para importação, exportação, teclado e tela única.
+- Tokens, componentes, estados e decisões estão em [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
+
+O layout original de combate, arsenal e personagem foi preservado. As mudanças da interface são incrementais e verificáveis.
