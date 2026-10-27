@@ -46,6 +46,17 @@ O projeto começou como um **clicker em jQuery em 2022** e foi modernizado mante
 - Bônus offline: 20% do DPS por segundo, a partir de 60s ausente e limite de 8 horas; não avança fases offline.
 - Sem conta, banco de dados ou servidor necessários.
 
+## Etapa 9 — Mais variedade na jogabilidade
+
+A progressão agora oferece três decisões/objetivos curtos além de atacar e comprar:
+- **Combo ativo:** atacar em sequência, com até 2,2 segundos entre golpes, acumula até seis acertos e até +50% de dano **manual**. Esperar demais reinicia o combo; o DPS automático não recebe bônus. O contador aparece somente durante um combo.
+- **Contratos de caça:** três objetivos cíclicos, derrotar três monstros, acertar oito golpes manuais e usar duas habilidades. A recompensa em moedas deve ser resgatada; as missões mudam depois do resgate e não pagam duas vezes.
+- **Baú a cada cinco fases concluídas:** permite escolher moedas extras, +1 nível de Força ou +1 nível de Autômato. A escolha permanece pendente no save até o resgate; o combate é pausado, mas nada é perdido ao fechar o navegador. Se uma melhoria estiver no máximo, seu prêmio vira moedas.
+- **DPS decimal:** o painel exibe o ganho real (ex.: `1,2`), sem alterar o cálculo do dano.
+- **Sem telas extras:** contratos aparecem numa faixa compacta e a seleção do baú ocorre dentro da arena. Todos os painéis continuam limitados à altura da janela.
+
+A atualização preserva o save `gameClickerV3`, equipamentos, fase, HP e conquistas anteriores. Os campos novos (`hunt`, `pendingChests` e `chestsOpened`) começam neutros para partidas antigas. O combo é temporário e reinicia ao recarregar. O baú começa a ser oferecido nas **próximas fases múltiplas de cinco derrotadas após a atualização**, sem conceder retroativamente baús de fases antigas.
+
 ## Etapa 8.1 — Ajustes após a captura da fase 32
 
 - Corrigida a escala individual dos sprites: morcego e slime pequenos, golem intermediário, chefes maiores. A linha de base do herói e dos inimigos é compartilhada.
