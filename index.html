@@ -54,7 +54,13 @@
           <h2 id="enemyName">Criatura Sombria</h2>
           <div class="hp-label"><span>Vida do inimigo</span><span id="enemyHpLabel">12 / 12</span></div>
           <progress id="enemyHpBar" max="12" value="12" aria-label="Vida do inimigo"></progress>
-          <p class="reward-label">Recompensa: <strong id="rewardValue">10</strong> moedas</p>
+          <div class="engagement-row">
+            <p class="reward-label">Recompensa: <strong id="rewardValue">10</strong> moedas</p>
+            <div class="hunt-strip" id="huntStrip" aria-label="Contrato de caça">
+              <span id="huntText">Missão: derrotar 3 monstros · 0/3</span>
+              <button id="huntClaim" type="button" hidden>Resgatar</button>
+            </div>
+          </div>
         </div>
         <button id="attackButton" class="arena" type="button" aria-label="Atacar inimigo">
           <span class="arena-scene" aria-hidden="true">
@@ -64,6 +70,7 @@
             </span>
           </span>
           <span class="attack-prompt">TOQUE PARA ATACAR</span>
+          <span id="comboBadge" class="combo-badge" aria-live="off" hidden>COMBO</span>
           <span id="hitNumber" class="hit-number" aria-hidden="true"></span>
           <span id="waveNotice" class="wave-notice" aria-hidden="true"></span>
           <span id="impactBurst" class="impact-burst" aria-hidden="true"></span>
@@ -71,6 +78,18 @@
           <span id="defeatGhost" class="defeat-ghost" aria-hidden="true"><img id="defeatSprite" alt=""></span>
           <span id="victoryBanner" class="victory-banner" aria-hidden="true"></span>
         </button>
+        <section id="chestPanel" class="chest-panel" role="dialog" aria-modal="true" aria-labelledby="chestTitle" hidden>
+          <div class="chest-content">
+            <div class="chest-kicker">RECOMPENSA DE MARCO</div>
+            <h3 id="chestTitle">Baú conquistado!</h3>
+            <p>Escolha sua recompensa. O combate continua depois da escolha.</p>
+            <div class="chest-options">
+              <button type="button" data-chest="gold"><strong>Moedas</strong><span id="chestGoldText">Bônus em ouro</span></button>
+              <button type="button" data-chest="strength"><strong>Força</strong><span>+1 nível permanente</span></button>
+              <button type="button" data-chest="engine"><strong>Autômato</strong><span>+1 nível permanente</span></button>
+            </div>
+          </div>
+        </section>
         <div class="skill-bar" aria-label="Habilidades especiais">
           <button id="smashSkill" type="button" class="skill-button" aria-label="Ativar Golpe poderoso"></button>
           <button id="furySkill" type="button" class="skill-button" aria-label="Ativar Fúria"></button>
