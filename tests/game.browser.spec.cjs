@@ -482,3 +482,109 @@ test("Etapa 8.1 mostra recarga com segundos e progresso sem mudar altura",async 
   expect(sizes.height).toBeLessThanOrEqual(sizes.viewport+2);
   expect(sizes.width).toBeLessThanOrEqual(sizes.viewportWidth+2);
 });
+
+
+test("Etapa 9 exibe combo por cliques ritmados e o reinicia quando o jogador para",async ({page})=>{
+  const owned=Array(10).fill(0);owned[0]=20;
+  await openWithSave(page,{stage:21,owned});
+  await page.locator("#attackButton").click();
+  await page.waitForTimeout(380);
+  await page.locator("#attackButton").click();
+  await expect(page.locator("#comboBadge")).toContainText("COMBO 2");
+  await page.waitForTimeout(380);
+  await page.locator("#attackButton").click();
+  await expect(page.locator("#comboBadge")).toContainText("COMBO 3");
+  await page.waitForTimeout(2600);
+  await expect(page.locator("#comboBadge")).toBeHidden();
+  const dimensions=await page.evaluate(()=>({doc:document.documentElement.scrollHeight,viewport:innerHeight}));
+  expect(dimensions.doc).toBeLessThanOrEqual(dimensions.viewport+2);
+});
+
+test("Etapa 9 permite resgatar contrato concluído e inicia próximo objetivo",async ({page})=>{
+  await page.addInitScript(()=>{
+    if(sessionStorage.getItem("__quest9"))return;
+    localStorage.clear();
+    const old=window.localStorage;
+    old.setItem("gameClickerV3",JSON.stringify({
+      version:3,balanceVersion:2,stage:3,hp:1,money:0,
+      owned:Array(10).fill(0),kills:2,bosses:0,
+      hunt:{cycle:0,progress:2,ready:false,reward:0},lastSeen:Date.now()
+    }));
+    sessionStorage.setItem("__quest9","1");
+  });
+  await page.goto("/");
+  await expect(page.locator("#huntText")).toContainText("2/3");
+  await page.locator("#attackButton").click();
+  await expect(page.locator("#huntText")).toContainText("Missão concluída");
+  await expect(page.locator("#huntClaim")).toBeVisible();
+  await page.locator("#huntClaim").click();
+  await expect(page.locator("#huntText")).toContainText("8 golpes manuais");
+  const money=Number((await page.locator("#valor").textContent()).replace(/\D/g,""));
+  expect(money).toBeGreaterThan(0);
+  await page.reload();
+  await expect(page.locator("#huntText")).toContainText("8 golpes manuais");
+  await expect(page.locator("#huntClaim")).toBeHidden();
+});
+
+test("Etapa 9 abre baú da fase 5, pausa combate e conserva escolha no save",async ({page})=>{
+  await page.addInitScript(()=>{
+    if(sessionStorage.getItem("__chest9"))return;
+    localStorage.clear();
+    localStorage.setItem("gameClickerV3",JSON.stringify({
+      version:3,balanceVersion:2,stage:5,hp:1,money:0,
+      owned:Array(10).fill(0),kills:4,bosses:0,lastSeen:Date.now()
+    }));
+    sessionStorage.setItem("__chest9","1");
+  });
+  await page.goto("/");
+  await page.locator("#attackButton").click();
+  await expect(page.locator("#chestPanel")).toBeVisible();
+  await expect(page.locator("#attackButton")).toBeDisabled();
+  await expect(page.locator("#smashSkill")).toBeDisabled();
+  const first=await page.evaluate(()=>JSON.parse(localStorage.getItem("gameClickerV3")).pendingChests);
+  expect(first).toBe(1);
+  await page.reload();
+  await expect(page.locator("#chestPanel")).toBeVisible();
+  await page.locator('[data-chest="engine"]').click();
+  await expect(page.locator("#chestPanel")).toBeHidden();
+  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("gameClickerV3")));
+  expect(saved.upgrades.engine).toBe(1);
+  expect(saved.pendingChests).toBe(0);
+  expect(saved.chestsOpened).toBe(1);
+  await page.reload();
+  await expect(page.locator("#chestPanel")).toBeHidden();
+  await expect(page.locator("#stageLabel")).toHaveText("FASE 6");
+});
+
+test("Etapa 9 mantém missão e baú dentro da única tela em desktop e celular",async ({page},info)=>{
+  const viewport=info.project.name==="desktop-chromium"
+    ? {width:1366,height:647}:{width:390,height:844};
+  await page.setViewportSize(viewport);
+  await page.addInitScript(()=>{
+    if(sessionStorage.getItem("__layoutChest9"))return;
+    localStorage.clear();
+    localStorage.setItem("gameClickerV3",JSON.stringify({
+      version:3,balanceVersion:2,stage:6,hp:5,money:20,
+      owned:Array(10).fill(0),kills:5,bosses:0,pendingChests:1,lastSeen:Date.now()
+    }));
+    sessionStorage.setItem("__layoutChest9","1");
+  });
+  await page.goto("/");
+  await expect(page.locator("#chestPanel")).toBeVisible();
+  await expect(page.locator("#huntText")).toBeVisible();
+  const header=await page.locator(".enemy-header").boundingBox();
+  const overlay=await page.locator("#chestPanel").boundingBox();
+  expect(overlay.y).toBeGreaterThanOrEqual(header.y+header.height+3);
+  for(const button of await page.locator("#chestPanel [data-chest]").all()){
+    const box=await button.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box.y+box.height).toBeLessThanOrEqual(viewport.height-2);
+  }
+  const geometry=await page.evaluate(()=>({
+    totalHeight:document.documentElement.scrollHeight,
+    totalWidth:document.documentElement.scrollWidth,
+    h:innerHeight,w:innerWidth
+  }));
+  expect(geometry.totalHeight).toBeLessThanOrEqual(geometry.h+2);
+  expect(geometry.totalWidth).toBeLessThanOrEqual(geometry.w+2);
+});

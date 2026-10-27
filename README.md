@@ -19,6 +19,9 @@ O projeto começou em **2022 como experimento HTML, CSS, JavaScript e jQuery**. 
 | **Progressão** | Fases com inimigos e chefe a cada dez fases |
 | **Arsenal** | Dez armas com melhorias e preços progressivos |
 | **DPS** | Dano automático aplicado aos monstros |
+| **Combos** | Acertos manuais em ritmo por até 2,2 s, com bônus crescente |
+| **Contratos** | Missões curtas de combate com moedas resgatáveis |
+| **Baús** | A cada cinco fases derrotadas, escolha ouro ou melhoria permanente |
 | **Críticos** | Chance de crítico e dano ampliado |
 | **Habilidades** | Golpe poderoso, Fúria e Esquiva em situações específicas |
 | **Melhorias** | Força, Autômato, Precisão e Fortuna |
@@ -32,6 +35,12 @@ O jogo possui críticos com **5% de chance base**, ampliáveis por Precisão; **
 O bônus offline considera **20% do DPS por segundo**, após 60 s de ausência e limitado a oito horas; não avança fases enquanto o jogador está fora.
 
 Chefes podem anunciar ataques para permitir **Esquiva (E)**. Animações e avisos respeitam `prefers-reduced-motion` quando disponível.
+
+### Novidades da Etapa 9
+
+O jogo agora combina **combo ativo** (até seis golpes e +50% de dano manual), **contratos de caça** (elimine três monstros, acerte oito golpes ou use duas habilidades) e **baús de escolha** nas fases múltiplas de cinco. Os baús permanecem salvos até escolher ouro, Força ou Autômato; combates ficam pausados durante a escolha. A missão aparece na arena, sem abrir novas telas. O DPS também é exibido com uma casa decimal.
+
+Saves antigos `gameClickerV3` continuam compatíveis. As recompensas por baús valem para derrotas **posteriores à atualização**, não retroativamente. As notas completas de versões anteriores continuam no arquivo histórico em `docs/`.
 
 ## Regra de interface: tudo em uma tela
 

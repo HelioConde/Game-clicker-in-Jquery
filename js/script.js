@@ -9,6 +9,7 @@
   const state = core.normalize(readJSON("gameClickerV3") || readJSON("gameClickerV2"), legacy);
   const offline = core.claimOffline(state, Date.now());
   const number = n => Math.floor(n).toLocaleString("pt-BR");
+  const precise = n => n.toLocaleString("pt-BR",{maximumFractionDigits:1});
   const sound = id => {
     if (!state.sound) return;
     const audio = $(id);
@@ -59,7 +60,7 @@
   function renderStats() {
     $("valor").textContent = number(state.money);
     $("clickStat").textContent = number(core.clickPower(state));
-    $("dpsStat").textContent = number(core.dps(state));
+    $("dpsStat").textContent = precise(core.dps(state));
     $("killStat").textContent = number(state.kills);
     $("bossStat").textContent = number(state.bosses);
     $("critStat").textContent = Math.round(core.critChance(state) * 100) + "%";
@@ -116,7 +117,7 @@
       const remain = Math.max(0, (state.skillReady[key] - now) / 1000);
       const isFury = key === "fury";
       const active = isFury && core.furyActive(state, now);
-      button.disabled = remain > 0;
+      button.disabled = remain > 0 || state.pendingChests > 0;
       button.classList.toggle("active", active);
       button.classList.toggle("cooldown", remain > 0 && !active);
       const name = isFury ? "🔥 Fúria" : "⚡ Golpe poderoso";
@@ -141,6 +142,70 @@
           : remain > 0 ? ", recarga em " + Math.ceil(remain) + " segundos" : ", pronto"));
     }
   }
+  function renderHunt(){
+    const quest=core.huntInfo(state);
+    $("huntText").textContent = (quest.ready ? "Missão concluída!" : quest.label) +
+      " · " + quest.progress + "/" + quest.target;
+    $("huntClaim").hidden = !quest.ready;
+    $("huntClaim").textContent = "+" + number(quest.reward) + " moedas";
+    $("huntStrip").classList.toggle("completed",quest.ready);
+  }
+  function renderCombo(now=Date.now()){
+    const combo=state.combo;
+    const alive=combo.count>=2&&now-combo.last<=core.COMBO_WINDOW&&now>=combo.last;
+    $("comboBadge").hidden=!alive;
+    if(alive) $("comboBadge").textContent = "COMBO " + combo.count + " · ×" +
+      precise(core.comboMultiplier(combo.count));
+  }
+  let chestVisible=false;
+  function renderChest(){
+    const pending=state.pendingChests>0;
+    const chest=$("chestPanel");
+    chest.hidden=!pending;
+    if(pending){
+      const panel=document.querySelector(".battle-panel").getBoundingClientRect();
+      const header=document.querySelector(".enemy-header").getBoundingClientRect();
+      // Nunca cobrir vida, recompensa ou objetivo, independentemente da altura.
+      chest.style.top=Math.max(0,header.bottom-panel.top+6)+"px";
+    }
+    $("attackButton").disabled=pending;
+    $("chestGoldText").textContent = "+" + number(core.chestGold(state)) + " moedas";
+    for(const key of ["strength","engine"]){
+      const opt=chest.querySelector('[data-chest="'+key+'"] span');
+      opt.textContent = state.upgrades[key]>=core.UPGRADES[key].max
+        ? "Nível máximo · receber moedas" : "+1 nível permanente";
+    }
+    if(pending&&!chestVisible){
+      chest.querySelector('[data-chest="gold"]').focus({preventScroll:true});
+    } else if(!pending&&chestVisible){
+      $("attackButton").focus({preventScroll:true});
+    }
+    chestVisible=pending;
+  }
+  $("huntClaim").addEventListener("click",()=>{
+    const reward=core.claimHunt(state);
+    if(!reward)return;
+    sound("dinheiroSom");
+    message("Contrato concluído! +" + number(reward) + " moedas.");
+    renderAll();save();
+  });
+  for(const button of document.querySelectorAll("[data-chest]")){
+    button.addEventListener("click",()=>{
+      const result=core.claimChest(state,button.dataset.chest);
+      if(!result.ok)return;
+      sound("levelUpSom");
+      message(result.gold ? "Você escolheu +" + number(result.gold) + " moedas!"
+        : "Melhoria permanente recebida: " + (result.choice==="strength"?"Força":"Autômato") + "!");
+      renderAll();save();
+    });
+  }
+  $("chestPanel").addEventListener("keydown",event=>{
+    if(event.key!=="Tab")return;
+    const choices=Array.from(document.querySelectorAll("#chestPanel [data-chest]"));
+    const current=choices.indexOf(document.activeElement);
+    if(event.shiftKey&&current<=0){event.preventDefault();choices[choices.length-1].focus();}
+    else if(!event.shiftKey&&current===choices.length-1){event.preventDefault();choices[0].focus();}
+  });
   function renderEnemy() {
     const enemy = core.enemyFor(state.stage);
     const arena = $("attackButton");
@@ -179,7 +244,7 @@
     $("enemyHpLabel").textContent = number(Math.ceil(state.hp)) + " / " + number(enemy.hp);
     $("rewardValue").textContent = number(enemy.reward);
   }
-  function renderAll() { renderStats(); renderShop(); renderUpgrades(); renderEnemy(); renderSkills(); }
+  function renderAll() { renderStats(); renderShop(); renderUpgrades(); renderEnemy(); renderSkills(); renderHunt(); renderCombo(); renderChest(); }
   function message(text) { $("battleMessage").textContent = text; }
   let waveTimer = null;
   function showWaveNotice(enemy, bossDown = false) {
@@ -304,6 +369,8 @@
     renderShop();
     renderUpgrades();
     renderStats();
+    renderHunt();
+    renderChest();
     const next = core.enemyFor(state.stage);
     showWaveNotice(next, result.bosses > 0);
     save();
@@ -324,13 +391,15 @@
   let animating = false;
   let attackTimer = null;
   function attack() {
-    if (animating || performance.now()<bossBattle.stunUntil) return;
+    if (animating || state.pendingChests>0 || performance.now()<bossBattle.stunUntil) return;
     animating = true;
     const hit = core.strike(state, Date.now());
     const damage = hit.damage;
     const result = hit.result;
     $("personagem").src = "img/attack.gif";
     animateImpact(damage, hit.critical);
+    renderCombo();
+    renderHunt();
     const arena = $("attackButton");
     sound("espada");
     renderEnemy();
@@ -346,6 +415,7 @@
   $("attackButton").addEventListener("click", attack);
   for (const [key, id] of [["smash","smashSkill"],["fury","furySkill"]]) {
     $(id).addEventListener("click", () => {
+      if(state.pendingChests>0)return;
       const effect = core.activateSkill(state, key, Date.now());
       if (!effect.ok) { renderSkills(); return; }
       sound("espada");
@@ -386,7 +456,13 @@
     const elapsed = Math.min(0.5, Math.max(0, (now - last) / 1000));
     last = now;
     if (document.hidden) return;
+    if(state.pendingChests>0){
+      renderCombo();renderSkills(Date.now());renderHunt();renderChest();
+      if(now-lastSave>=2000){save();lastSave=now;}
+      return;
+    }
     updateBossAttack(now);
+    renderCombo();
     renderSkills(Date.now());
     const power = core.dps(state) * (core.furyActive(state, Date.now()) ? 2 : 1);
     if (power > 0) {
