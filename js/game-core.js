@@ -23,6 +23,14 @@
     smash:{name:"Golpe poderoso",cooldown:15000},
     fury:{name:"Fúria",cooldown:60000,duration:10000}
   });
+  const HUNTS = Object.freeze([
+    {id:"defeat",label:"Derrote 3 monstros",target:3,event:"kill"},
+    {id:"combo",label:"Acerte 8 golpes manuais",target:8,event:"hit"},
+    {id:"skills",label:"Use 2 habilidades",target:2,event:"skill"}
+  ]);
+  const CHEST_CHOICES = Object.freeze(["gold","strength","engine"]);
+  const COMBO_WINDOW = 2200;
+  const COMBO_MAX = 6;
   const finite = value => {
     const n=Number(value);
     return Number.isFinite(n) && n >= 0 ? Math.min(n,MAX) : 0;
@@ -106,9 +114,72 @@
       },
       furyUntil:advanced?timestamp(saved.furyUntil):0,
       lastSeen:advanced?timestamp(saved.lastSeen):0,
-      offlineEarned:advanced?Math.floor(finite(saved.offlineEarned)):0
+      offlineEarned:advanced?Math.floor(finite(saved.offlineEarned)):0,
+      hunt:{
+        cycle:advanced?Math.floor(Math.min(9999,finite(saved.hunt?.cycle))):0,
+        progress:advanced?Math.floor(Math.min(100,finite(saved.hunt?.progress))):0,
+        ready:advanced? saved.hunt?.ready === true : false,
+        reward:advanced?Math.floor(finite(saved.hunt?.reward)):0
+      },
+      pendingChests:advanced?Math.floor(Math.min(20,finite(saved.pendingChests))):0,
+      chestsOpened:advanced?Math.floor(finite(saved.chestsOpened)):0,
+      combo:{count:0,last:0}
     };
   }
+  function huntInfo(s) {
+    const cycle=s.hunt?.cycle||0;
+    const item=HUNTS[cycle%HUNTS.length];
+    const reward = s.hunt?.ready
+      ? finite(s.hunt.reward)
+      : Math.min(MAX,Math.ceil(enemyFor(s.stage).reward*(1.5+.15*Math.min(cycle,8))));
+    return {...item,progress:Math.min(item.target,Math.floor(finite(s.hunt?.progress))),
+      ready:s.hunt?.ready===true,reward};
+  }
+  function recordHunt(s,event,amount=1) {
+    const hunt=huntInfo(s);
+    if(hunt.ready||hunt.event!==event)return false;
+    s.hunt.progress=Math.min(hunt.target,s.hunt.progress+Math.floor(finite(amount)));
+    if(s.hunt.progress>=hunt.target){
+      s.hunt.ready=true;
+      s.hunt.reward=hunt.reward;
+      return true;
+    }
+    return false;
+  }
+  function claimHunt(s){
+    if(!s.hunt?.ready)return 0;
+    const value=finite(s.hunt.reward);
+    s.money=Math.min(MAX,s.money+value);
+    s.hunt={cycle:Math.min(9999,s.hunt.cycle+1),progress:0,ready:false,reward:0};
+    return value;
+  }
+  const chestGold=s=>Math.min(MAX,Math.ceil(enemyFor(Math.max(1,s.stage-1)).reward*3));
+  function claimChest(s,choice){
+    if(!CHEST_CHOICES.includes(choice)||!s.pendingChests)return {ok:false};
+    let kind=choice, gold=0;
+    if(choice==="gold"){
+      gold=chestGold(s);
+    }else if((s.upgrades?.[choice]||0)<UPGRADES[choice].max){
+      s.upgrades[choice]++;
+    }else{
+      kind="gold";
+      gold=chestGold(s);
+    }
+    s.money=Math.min(MAX,s.money+gold);
+    s.pendingChests--;
+    s.chestsOpened=Math.min(MAX,s.chestsOpened+1);
+    return {ok:true,choice:kind,gold};
+  }
+  function updateCombo(s,now){
+    const t=timestamp(now);
+    const previous=s.combo||{count:0,last:0};
+    const delta=t-previous.last;
+    const count=previous.count>0&&delta>0&&delta<=COMBO_WINDOW
+      ? Math.min(COMBO_MAX,previous.count+1):1;
+    s.combo={count,last:t};
+    return count;
+  }
+  const comboMultiplier = count => 1+.1*Math.max(0,Math.min(COMBO_MAX,count)-1);
   const clickPower = s => Math.min(MAX,Math.ceil(
     (1+WEAPONS.reduce((sum,w,i)=>sum+w[2]*s.owned[i],0)) *
     (1+.2*(s.upgrades?.strength||0))
@@ -161,6 +232,10 @@
       s.money=Math.min(MAX,s.money+prize);
       s.kills=Math.min(MAX,s.kills+1);
       if(enemy.boss)s.bosses=Math.min(MAX,s.bosses+1);
+      if(enemy.stage%5===0){
+        s.pendingChests=Math.min(20,(s.pendingChests||0)+1);
+      }
+      recordHunt(s,"kill");
       s.stage=Math.min(9999,s.stage+1);
       s.hp=enemyFor(s.stage).hp;
     }
@@ -171,8 +246,10 @@
     const sample=Number(random());
     const critical=Number.isFinite(sample)&&sample>=0&&sample<critChance(s);
     const boost=furyActive(s,now)?2:1;
-    const points=Math.ceil(clickPower(s)*boost*(critical?2:1));
-    return {damage:points,critical,result:damage(s,points)};
+    const combo=updateCombo(s,now);
+    recordHunt(s,"hit");
+    const points=Math.max(1,Math.floor(clickPower(s)*boost*(critical?2:1)*comboMultiplier(combo)));
+    return {damage:points,critical,combo,multiplier:comboMultiplier(combo),result:damage(s,points)};
   }
   function activateSkill(s,skill,now) {
     if(!SKILLS[skill])return {ok:false,reason:"unknown"};
@@ -180,6 +257,7 @@
     if(!time)return {ok:false,reason:"clock"};
     if(time < s.skillReady[skill])return {ok:false,reason:"cooldown",remaining:s.skillReady[skill]-time};
     s.skillReady[skill]=time+SKILLS[skill].cooldown;
+    recordHunt(s,"skill");
     if(skill==="fury") {
       s.furyUntil=time+SKILLS.fury.duration;
       return {ok:true,duration:SKILLS.fury.duration};
@@ -201,6 +279,7 @@
     s.offlineEarned=Math.min(MAX,s.offlineEarned+gold);
     return {seconds:Math.floor(seconds),gold};
   }
-  return {WEAPONS,UPGRADES,SKILLS,ENEMIES,REGIONS,normalize,enemyFor,clickPower,dps,critChance,
-    price,upgradePrice,buy,buyUpgrade,damage,strike,activateSkill,furyActive,claimOffline};
+  return {WEAPONS,UPGRADES,SKILLS,HUNTS,CHEST_CHOICES,ENEMIES,REGIONS,normalize,enemyFor,clickPower,dps,critChance,
+    price,upgradePrice,buy,buyUpgrade,damage,strike,activateSkill,furyActive,claimOffline,
+    huntInfo,claimHunt,recordHunt,claimChest,chestGold,comboMultiplier,COMBO_WINDOW};
 });
