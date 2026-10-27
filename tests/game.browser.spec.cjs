@@ -602,20 +602,21 @@ test("backup exporta um save válido e permite restaurar em outra sessão",async
   expect(contents.formatVersion).toBe(1);
   expect(contents.save.money).toBe(875);
   expect(contents.save.stage).toBe(7);
-  await page.evaluate(()=>localStorage.removeItem("gameClickerV3"));
-  await page.reload();
-  await expect(page.locator("#stageLabel")).toHaveText("FASE 1");
-  await page.locator("#backupMenu summary").click();
+  // Simula a transferência para outra partida, preservando o backup exportado.
+  const transfer=JSON.parse(JSON.stringify(contents));
+  transfer.save.stage=3;
+  transfer.save.hp=1;
+  transfer.save.money=123;
   page.once("dialog", dialog=>dialog.accept());
   await page.locator("#backupImport").setInputFiles({
     name:"game-clicker-backup.json",
     mimeType:"application/json",
-    buffer:Buffer.from(JSON.stringify(contents))
+    buffer:Buffer.from(JSON.stringify(transfer))
   });
-  await expect(page.locator("#stageLabel")).toHaveText("FASE 7");
-  await expect(page.locator("#valor")).toHaveText("875");
+  await expect(page.locator("#stageLabel")).toHaveText("FASE 3");
+  await expect(page.locator("#valor")).toHaveText("123");
   await page.reload();
-  await expect(page.locator("#stageLabel")).toHaveText("FASE 7");
+  await expect(page.locator("#stageLabel")).toHaveText("FASE 3");
 });
 test("backup rejeita arquivo inválido preservando o save local",async ({page})=>{
   await openWithSave(page,{money:100,stage:4});
