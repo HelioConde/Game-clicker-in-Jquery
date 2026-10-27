@@ -162,6 +162,12 @@
     const pending=state.pendingChests>0;
     const chest=$("chestPanel");
     chest.hidden=!pending;
+    if(pending){
+      const panel=document.querySelector(".battle-panel").getBoundingClientRect();
+      const header=document.querySelector(".enemy-header").getBoundingClientRect();
+      // Nunca cobrir vida, recompensa ou objetivo, independentemente da altura.
+      chest.style.top=Math.max(0,header.bottom-panel.top+6)+"px";
+    }
     $("attackButton").disabled=pending;
     $("chestGoldText").textContent = "+" + number(core.chestGold(state)) + " moedas";
     for(const key of ["strength","engine"]){
