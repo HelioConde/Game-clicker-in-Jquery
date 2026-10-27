@@ -17,6 +17,17 @@
       </div>
       <div class="topbar-actions">
         <span id="saveStatus" class="save-status" role="status">Progresso local</span>
+        <details class="save-menu" id="backupMenu">
+          <summary class="secondary-button" aria-label="Abrir opções de backup do progresso">☁ Backup</summary>
+          <div class="backup-popover">
+            <strong>Seu progresso é local</strong>
+            <p>Faça uma cópia antes de trocar de navegador ou dispositivo.</p>
+            <button id="backupExport" class="backup-action" type="button">↓ Exportar save (.json)</button>
+            <label class="backup-action" for="backupImport">↑ Importar save (.json)</label>
+            <input id="backupImport" class="visually-hidden" type="file" accept=".json,application/json" aria-describedby="backupStatus">
+            <p id="backupStatus" role="status" aria-live="polite">O arquivo permanece no seu dispositivo.</p>
+          </div>
+        </details>
         <button id="config" class="secondary-button" type="button" aria-pressed="false">Som: ligado</button>
       </div>
     </header>
@@ -121,7 +132,7 @@
         </div>
       </aside>
     </main>
-    <footer class="footer">Progresso salvo neste navegador · Sem login · Ataque com clique, toque, Enter ou Espaço</footer>
+    <footer class="footer">Progresso salvo neste navegador · Backup JSON disponível · Sem login · Ataque com clique, toque, Enter ou Espaço</footer>
   </div>
   <audio id="levelUpSom" preload="none" src="efeito/levelup.mp3"></audio>
   <audio id="espada" preload="none" src="efeito/espada.mp3"></audio>
@@ -129,5 +140,6 @@
   <audio id="erro" preload="none" src="efeito/erro.mp3"></audio>
   <script src="js/game-core.js"></script>
   <script src="js/script.js"></script>
+  <script src="js/backup.js"></script>
 </body>
 </html>
