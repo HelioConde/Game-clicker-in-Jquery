@@ -342,3 +342,92 @@ test("Etapa 8 mantém HP, recursos e progresso salvos durante rotação de monst
   assert.equal(state.kills,20);
   assert.equal(game.enemyFor(state.stage).sheet,"img/inimigos/golem-pedra-sheet.svg");
 });
+
+
+test("Etapa 9 cria combo por ritmo de ataque, mas não afeta DPS",()=>{
+  const s=game.normalize(null,{dinheiro:0,arma2:20});
+  const base=game.clickPower(s);
+  const passive=game.dps(s);
+  const first=game.strike(s,1_000_000,()=>.99);
+  const second=game.strike(s,1_000_600,()=>.99);
+  const third=game.strike(s,1_001_300,()=>.99);
+  assert.equal(first.combo,1);
+  assert.equal(first.damage,base);
+  assert.equal(second.combo,2);
+  assert.ok(second.damage>first.damage);
+  assert.equal(third.combo,3);
+  assert.ok(third.damage>=second.damage);
+  assert.equal(game.dps(s),passive);
+  const reset=game.strike(s,1_004_000,()=>.99);
+  assert.equal(reset.combo,1);
+  assert.equal(reset.damage,base);
+});
+
+test("contratos alternam mortes, cliques e habilidades com prêmio resgatado uma vez",()=>{
+  const s=game.normalize(null,{});
+  assert.equal(game.huntInfo(s).id,"defeat");
+  assert.equal(game.huntInfo(s).progress,0);
+  for(let i=0;i<3;i++)game.recordHunt(s,"kill");
+  assert.equal(game.huntInfo(s).ready,true);
+  const reward=game.huntInfo(s).reward;
+  assert.ok(reward>0);
+  assert.equal(game.claimHunt(s),reward);
+  assert.equal(game.claimHunt(s),0);
+  assert.equal(s.money,reward);
+  assert.equal(game.huntInfo(s).id,"combo");
+  game.recordHunt(s,"kill",10);
+  assert.equal(game.huntInfo(s).progress,0);
+  for(let i=0;i<8;i++)game.recordHunt(s,"hit");
+  assert.equal(game.huntInfo(s).ready,true);
+  game.claimHunt(s);
+  assert.equal(game.huntInfo(s).id,"skills");
+  assert.equal(game.activateSkill(s,"fury",1_000_000).ok,true);
+  assert.equal(game.activateSkill(s,"smash",1_001_000).ok,true);
+  assert.equal(game.huntInfo(s).ready,true);
+});
+
+test("uma vitória da fase 5 libera baú de escolha sem premiar duas vezes",()=>{
+  const s=game.normalize({version:3,stage:5,hp:1,owned:Array(10).fill(0),money:0,kills:4,bosses:0});
+  const result=game.damage(s,1);
+  assert.equal(result.kills,1);
+  assert.equal(s.stage,6);
+  assert.equal(s.pendingChests,1);
+  assert.equal(game.claimChest(s,"invalido").ok,false);
+  assert.equal(s.pendingChests,1);
+  const after=game.claimChest(s,"strength");
+  assert.equal(after.ok,true);
+  assert.equal(s.upgrades.strength,1);
+  assert.equal(s.pendingChests,0);
+  assert.equal(s.chestsOpened,1);
+  assert.equal(game.claimChest(s,"strength").ok,false);
+});
+
+test("baús oferecem ouro ou DPS, e fazem fallback no nível máximo",()=>{
+  const a=game.normalize({version:3,stage:11,hp:5,owned:Array(10).fill(0),pendingChests:1});
+  const gold=game.chestGold(a);
+  assert.ok(gold>0);
+  const r=game.claimChest(a,"gold");
+  assert.equal(r.gold,gold);
+  assert.equal(a.money,gold);
+  const b=game.normalize({version:3,stage:11,hp:5,owned:Array(10).fill(0),pendingChests:2});
+  assert.equal(game.claimChest(b,"engine").ok,true);
+  assert.equal(b.upgrades.engine,1);
+  b.upgrades.strength=game.UPGRADES.strength.max;
+  assert.equal(game.claimChest(b,"strength").choice,"gold");
+  assert.equal(b.upgrades.strength,game.UPGRADES.strength.max);
+  assert.equal(b.pendingChests,0);
+});
+
+test("save V3 antigo inicia missões e baús neutros; baú pendente é recuperado",()=>{
+  const old=game.normalize({version:3,money:432,stage:21,hp:77,owned:Array(10).fill(0),kills:20,bosses:2});
+  assert.equal(old.pendingChests,0);
+  assert.equal(old.hunt.cycle,0);
+  assert.equal(old.money,432);
+  const save=game.normalize({...old,pendingChests:1,
+    hunt:{cycle:1,progress:5,ready:false,reward:0}});
+  assert.equal(save.pendingChests,1);
+  assert.equal(game.huntInfo(save).id,"combo");
+  assert.equal(game.huntInfo(save).progress,5);
+  assert.equal(save.hp,77);
+  assert.equal(save.combo.count,0);
+});
