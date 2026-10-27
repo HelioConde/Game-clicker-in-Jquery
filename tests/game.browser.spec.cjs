@@ -572,6 +572,9 @@ test("Etapa 9 mantém missão e baú dentro da única tela em desktop e celular"
   await page.goto("/");
   await expect(page.locator("#chestPanel")).toBeVisible();
   await expect(page.locator("#huntText")).toBeVisible();
+  const header=await page.locator(".enemy-header").boundingBox();
+  const overlay=await page.locator("#chestPanel").boundingBox();
+  expect(overlay.y).toBeGreaterThanOrEqual(header.y+header.height+3);
   for(const button of await page.locator("#chestPanel [data-chest]").all()){
     const box=await button.boundingBox();
     expect(box).not.toBeNull();
